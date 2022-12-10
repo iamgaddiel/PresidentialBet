@@ -5,39 +5,39 @@ import { User, UserContextType } from '../@types/user'
 
 
 
+
+const user: User = {
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    state: "",
+    id: "",
+    gender: "male",
+}
+
+const registerUser = (user: User) => {
+    return user
+}
+
+const getUser = (id: string) => {
+    return ""
+}
+
+
+const loginUser = (email: string, password: string) => {
+    return user
+}
+
+export const UserContext = createContext<UserContextType>({
+    user,
+    registerUser,
+    getUser,
+    loginUser
+})
+
+
 const UserProvider = ({ children }: { children: any}) => {
-
-    const user: User = {
-        firstName: "",
-        lastName: "",
-        phone: "",
-        email: "",
-        state: "",
-        id: "",
-        gender: "male",
-    }
-
-    const registerUser = (user: User) => {
-        return user
-    }
-
-    const getUser = (id: string) => {
-        return ""
-    }
-
-    
-    const loginUser = (email: string, password: string) => {
-        return user
-    }
-
-    
-
-    const UserContext = createContext<UserContextType>({
-        user,
-        registerUser,
-        getUser,
-        loginUser
-    })
 
     return (
         <UserContext.Provider value={{ user, registerUser, getUser, loginUser }}>

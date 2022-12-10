@@ -34,9 +34,10 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import LandingPage from './pages/LandingPage';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { UtilContext, UtilContextValues } from './context/utilContext';
 
 // Bootstrap
 // import 'boostrap/'
@@ -44,7 +45,7 @@ import Register from './pages/Register';
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [showTabs, setShowTabs] = useState<boolean>(false);
+  const { showTabs } = useContext(UtilContext) as UtilContextValues
 
   return (
     <IonApp >
@@ -64,7 +65,7 @@ const App: React.FC = () => {
         </Route>
 
         {
-          showTabs && (
+          showTabs ? (
             <IonTabs>
               <IonRouterOutlet>
                 <Route exact path="/tab1">
@@ -96,7 +97,7 @@ const App: React.FC = () => {
                 </IonTabButton>
               </IonTabBar>
             </IonTabs>
-          )
+          ) : null
         }
       </IonReactRouter>
     </IonApp>

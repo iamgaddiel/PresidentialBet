@@ -4,14 +4,15 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import UserProvider from './context/UserProvider';
+import UtilProvider from './context/utilContext';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
   <React.StrictMode>
-    {/* <UserProvider> */}
+    <UtilProvider>
       <App />
-    {/* </UserProvider> */}
+    </UtilProvider>
   </React.StrictMode>
 );
 

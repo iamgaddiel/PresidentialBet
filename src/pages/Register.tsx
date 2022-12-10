@@ -1,11 +1,11 @@
-import { IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRouterLink, IonSelect, IonSelectOption, IonText, IonToast } from "@ionic/react"
+import { IonAlert, IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRouterLink, IonSelect, IonSelectOption, IonText, IonToast } from "@ionic/react"
 import { atSharp, eye, eyeOff, home, lockClosed, maleFemale, personSharp, phonePortraitOutline, print } from "ionicons/icons"
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from 'react-router-dom'
 
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { RegistrationFormType } from "../@types/forms";
 import useAuth from "../hooks/useAuth";
-import useDB from "../hooks/useDB";
 
 // Styles
 import './Login.css'
@@ -13,26 +13,32 @@ import './Login.css'
 
 
 const Register = () => {
+    const location = useLocation()
     const { createUser } = useAuth()
-
     const [showPassword, setShowPassword] = useState(false)
     const passwordFiled = useRef<HTMLIonInputElement>(null)
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState("")
+    const [showAlet, setShowAlert] = useState(false)
 
 
     const { handleSubmit, register, formState: { errors } } = useForm<RegistrationFormType>()
 
 
-
-    console.log(errors)
-    const checkRegistration = () => {
-        if (errors.password) setToastMessage(errors.password.message!);
-        if (errors.email) setToastMessage(errors.email.message!);
-        if (errors.firstName) setToastMessage(errors.firstName.message!);
-        if (errors.lastName) setToastMessage(errors.lastName.message!);
-        if (errors.phone) setToastMessage(errors.phone.message!);
+    
+    // console.log(errors)
+    const checkRegistration = (error: string) => {
+        // if (errors.password) setToastMessage(errors.password.message!);
+        // if (errors.email) setToastMessage(errors.email.message!);
+        // if (errors.firstName) setToastMessage(errors.firstName.message!);
+        // if (errors.lastName) setToastMessage(errors.lastName.message!);
+        // if (errors.phone) setToastMessage(errors.phone.message!);
+        setToastMessage(error)
         setShowToast(true);
+    }
+
+    const handleRegistrationComplete = () => {
+        location.pathname = "/login"
     }
 
     const handleTogglePasswordVisibility = (show: boolean) => {
@@ -42,8 +48,7 @@ const Register = () => {
         setShowPassword(!showPassword)
     }
 
-    const alertCreateError = (field: string, error: string ) => {
-        // setToastMessage(res.data.data.password.message || res.data.data.passwordConfirm.message);
+    const createErrorAlert = (field: string, error: string) => {
         setToastMessage(`${field}: ${error}`);
         setShowToast(true);
     }
@@ -52,24 +57,39 @@ const Register = () => {
     const handleRegistration: SubmitHandler<RegistrationFormType> = async (data) => {
         // handling db validation error
         const res: any = await createUser(data)
-        if ((res.code !== 200 || 201) && res.data.data.password) alertCreateError("password", res.data.data.password.message);
-        if ((res.code !== 200 || 201) && res.data.data.passwordConfirm) alertCreateError("passwordConfirm", res.data.data.passwordConfirm.message);
-        if ((res.code !== 200 || 201) && res.data.data.gender) alertCreateError("gender", res.data.data.gender.message);
-        if ((res.code !== 200 || 201) && res.data.data.phone) alertCreateError("phone", res.data.data.phone.message);
-        if ((res.code !== 200 || 201) && res.data.data.firstName) alertCreateError("firstName", res.data.data.firstName.message);
-        if ((res.code !== 200 || 201) && res.data.data.lastName) alertCreateError("lastName", res.data.data.lastName.message);
-        if ((res.code !== 200 || 201) && res.data.data.state) alertCreateError("state", res.data.data.state.message);
-        if ((res.code !== 200 || 201) && res.data.data.email) alertCreateError("email", res.data.data.email.message);
-
+        if ((res.code !== 200 || 201) && res?.data?.data?.password) createErrorAlert("password", res.data.data.password.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.passwordConfirm) createErrorAlert("passwordConfirm", res.data.data.passwordConfirm.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.gender) createErrorAlert("gender", res.data.data.gender.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.phone) createErrorAlert("phone", res.data.data.phone.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.firstName) createErrorAlert("firstName", res.data.data.firstName.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.lastName) createErrorAlert("lastName", res.data.data.lastName.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.state) createErrorAlert("state", res.data.data.state.message);
+        if ((res.code !== 200 || 201) && res?.data?.data?.email) createErrorAlert("email", res.data.data.email.message);
+        if (res.created) setShowAlert(true);
     }
 
-    useEffect(() => {
-        checkRegistration()
-    }, [])
 
     return (
         <IonPage>
             <IonContent fullscreen className='background'>
+
+                <IonAlert
+                    isOpen={showAlet}
+                    onDidDismiss={() => setShowAlert(false)}
+                    header="Sing up Complete"
+                    message="kindly login to continue to start making money"
+                    translucent={true}
+                    buttons={
+                        [
+                            {
+                                text: "Okay",
+                                role: "confirm",
+                                handler: () => handleRegistrationComplete()
+                            }
+                        ]
+                    }
+                />
+
                 <IonToast
                     isOpen={showToast}
                     color="danger"
