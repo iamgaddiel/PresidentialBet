@@ -21,3 +21,22 @@ export type Candidate = {
   party: string;
   description: string;
 };
+
+export type UserCollectionType = {
+  avatar: string;
+  collectionId: string;
+  collectionName: string;
+  created: string;
+  email: string;
+  emailVisibility: boolean;
+  expand: {};
+  firstName: string;
+  gender: string;
+  id: string;
+  lastName: string;
+  phone: string;
+  state: string;
+  updated: string;
+  username: string;
+  verified: boolean;
+};

@@ -1,7 +1,7 @@
 import { IonAlert, IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRouterLink, IonSelect, IonSelectOption, IonText, IonToast } from "@ionic/react"
 import { atSharp, eye, eyeOff, home, lockClosed, maleFemale, personSharp, phonePortraitOutline, print } from "ionicons/icons"
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { RegistrationFormType } from "../@types/forms";
@@ -13,7 +13,7 @@ import './Login.css'
 
 
 const Register = () => {
-    const location = useLocation()
+    const history = useHistory()
     const { createUser } = useAuth()
     const [showPassword, setShowPassword] = useState(false)
     const passwordFiled = useRef<HTMLIonInputElement>(null)
@@ -25,20 +25,8 @@ const Register = () => {
     const { handleSubmit, register, formState: { errors } } = useForm<RegistrationFormType>()
 
 
-    
-    // console.log(errors)
-    const checkRegistration = (error: string) => {
-        // if (errors.password) setToastMessage(errors.password.message!);
-        // if (errors.email) setToastMessage(errors.email.message!);
-        // if (errors.firstName) setToastMessage(errors.firstName.message!);
-        // if (errors.lastName) setToastMessage(errors.lastName.message!);
-        // if (errors.phone) setToastMessage(errors.phone.message!);
-        setToastMessage(error)
-        setShowToast(true);
-    }
-
     const handleRegistrationComplete = () => {
-        location.pathname = "/login"
+        history.push('/login')
     }
 
     const handleTogglePasswordVisibility = (show: boolean) => {

@@ -1,8 +1,10 @@
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonListHeader, IonPage, IonRouterLink, IonText, IonToast, IonToolbar } from "@ionic/react"
 import { atCircle, atSharp, eye, eyeOff, lockClosed, logoGoogle } from "ionicons/icons"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useHistory } from "react-router";
+import useAuth from "../hooks/useAuth";
 
 
 
@@ -19,24 +21,59 @@ const Login = () => {
     const passwordFiled = useRef<HTMLIonInputElement>(null)
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState("")
+    const { authenticateUser, pb, setAuthUser, getUser } = useAuth()
+    const history = useHistory()
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm<InputsType>();
+    console.log("🚀 ~ file: Login.tsx:28 ~ Login ~ errors", errors)
 
 
-    const handleFormSubmit: SubmitHandler<InputsType> = data => {
-        if (errors.email) setToastMessage("Email is required");
-        if (errors.password) setToastMessage("Password is required");
-        setShowToast(true);
+    /**
+     * 
+     * @param data 
+     * @returns void
+     */
+    const handleFormSubmit: SubmitHandler<InputsType> = async (data) => {
+        try {
+            const { email, password } = data;
+            const res: any = await authenticateUser(email, password)
 
-        console.log()
+            if (res.code === 400 && res.data) {
+                setToastMessage(`${res.message}`);
+                setShowToast(true);
+                return;
+            }
+
+            if (!pb.authStore.isValid) {
+                setToastMessage("incorrect login credentials")
+                setShowToast(true)
+                return;
+            }
+            const user = await getUser(pb.authStore.model?.id!)
+            setAuthUser(user)
+            history.push('/dashboard')
+        }
+        catch (err: any) {
+            throw new Error(err)
+        }
     }
 
 
+    /**
+     * @param {boolean} show 
+     */
     const handleTogglePasswordVisibility = (show: boolean) => {
         show ? passwordFiled.current!.setAttribute("type", 'password') : passwordFiled.current!.setAttribute("type", "text")
-        console.log(show, passwordFiled)
         setShowPassword(!showPassword)
     }
+
+
+    useEffect(() => {
+        if (errors.email) setToastMessage(`${errors.email?.message}`);
+        if (errors.password) setToastMessage(`${errors.password?.message}`);
+        setShowToast(true);
+    }, [errors.email, errors.password])
+
 
     return (
         <IonPage>
@@ -45,8 +82,9 @@ const Login = () => {
                     isOpen={showToast}
                     color="danger"
                     message={toastMessage}
-                    position="bottom"
+                    position="top"
                     onDidDismiss={() => setShowToast(false)}
+                    duration={3000}
                 />
 
                 <section className="heading ion-padding">
@@ -65,21 +103,43 @@ const Login = () => {
                             {/* email  */}
                             <IonItem class="ion-margin-vertical">
                                 <IonIcon icon={atSharp} slot='start' />
-                                <IonInput type="email" {...register('email', { required: true })} placeholder="Email ID" />
+                                <IonInput
+                                    type="email"
+                                    {...register('email',
+                                        {
+                                            required: {
+                                                message: "email is required",
+                                                value: true
+                                            }
+                                        }
+                                    )}
+                                    placeholder="Email ID"
+                                />
                             </IonItem>
 
                             {/* Pssword */}
                             <IonItem class="ion-margin-vertical">
                                 <IonIcon icon={lockClosed} slot='start' />
-                                <IonInput type="password" placeholder="Password" {...register('password', { required: true })} ref={passwordFiled} />
+                                <IonInput
+                                    type="password"
+                                    placeholder="Password"
+                                    {...register('password',
+                                        {
+                                            required: {
+                                                message: "password must not be empty",
+                                                value: true
+                                            }
+                                        }
+                                    )}
+                                />
 
-                                {
+                                {/* {
                                     showPassword ? (
                                         <IonIcon icon={eye} slot='end' onClick={() => handleTogglePasswordVisibility(false)} />
                                     ) : (
                                         <IonIcon icon={eyeOff} slot='end' onClick={() => handleTogglePasswordVisibility(true)} />
                                     )
-                                }
+                                } */}
                             </IonItem>
                             <IonItem>
                                 <IonRouterLink routerDirection="forward" href="/forgot-password" style={{ textAlign: 'center' }} className='forgot-password'>
@@ -103,7 +163,7 @@ const Login = () => {
                         <div className="ion-margin-top">
                             New to NVote?
                             <IonRouterLink routerDirection="forward" routerLink="/register" className='forgot-password ion-padding-horizontal'>
-                                Rgister
+                                Register
                             </IonRouterLink>
                         </div>
                     </section>

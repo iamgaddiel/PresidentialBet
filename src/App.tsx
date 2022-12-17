@@ -10,10 +10,7 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle } from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
-import Tab2 from './pages/Tab2';
-import Tab3 from './pages/Tab3';
+import { closeCircleOutline, ellipse, home, homeOutline, people, personCircleOutline, square, statsChartOutline, thumbsUpOutline, timeOutline, triangle } from 'ionicons/icons';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -38,9 +35,12 @@ import { useContext, useState } from 'react';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { UtilContext, UtilContextValues } from './context/utilContext';
+import Dashboard from './pages/Dashboard';
 
 // Bootstrap
-// import 'boostrap/'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Profile from './pages/Profile';
+import Candidates from './pages/Candidates';
 
 setupIonicReact();
 
@@ -63,38 +63,53 @@ const App: React.FC = () => {
         <Route exact path="/register">
           <Register />
         </Route>
+        <Route exact path="/dashboard">
+          <Dashboard />
+        </Route>
 
         {
           showTabs ? (
             <IonTabs>
               <IonRouterOutlet>
-                <Route exact path="/tab1">
-                  <Tab1 />
+                <Route exact path="/dashboard">
+                  <Dashboard />
                 </Route>
-                <Route exact path="/tab2">
-                  <Tab2 />
+                <Route exact path="/profile">
+                  <Profile />
                 </Route>
-                <Route path="/tab3">
-                  <Tab3 />
+                <Route exact path="/candidates">
+                  <Candidates />
                 </Route>
+
               </IonRouterOutlet>
               <IonTabBar slot="bottom">
-                <IonTabButton tab="tab1" href="/tab1">
-                  <IonIcon icon={triangle} />
-                  <IonLabel>Tab 1</IonLabel>
+
+                <IonTabButton tab="dashboard" href="/dashboard">
+                  <IonIcon icon={homeOutline} color='warning' />
+                  <IonLabel>Home</IonLabel>
                 </IonTabButton>
-                <IonTabButton tab="tab2" href="/tab2">
-                  <IonIcon icon={ellipse} />
-                  <IonLabel>Tab 2</IonLabel>
+
+                <IonTabButton tab="vote" href="/candidates">
+                  <IonIcon icon={people} color='warning' />
+                  <IonLabel>Candidates</IonLabel>
                 </IonTabButton>
-                <IonTabButton tab="tab3" href="/tab3">
-                  <IonIcon icon={square} />
-                  <IonLabel>Tab 3</IonLabel>
+
+                <IonTabButton tab="history" href="/history">
+                  <IonIcon icon={timeOutline} color='warning' />
+                  <IonLabel>History</IonLabel>
                 </IonTabButton>
-                <IonTabButton tab="tab3" href="/tab3">
-                  <IonIcon icon={square} />
-                  <IonLabel>Tab 3</IonLabel>
+
+                <IonTabButton tab="stats" href="/stats">
+                  <IonIcon icon={statsChartOutline} color='warning' />
+                  <IonLabel>Stats</IonLabel>
                 </IonTabButton>
+
+                <IonTabButton tab="profile" href="/profile">
+                  <IonIcon icon={personCircleOutline}  color='warning' />
+                  <IonLabel >Profile</IonLabel>
+                </IonTabButton>
+
+
               </IonTabBar>
             </IonTabs>
           ) : null

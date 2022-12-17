@@ -5,14 +5,17 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import UserProvider from './context/UserProvider';
 import UtilProvider from './context/utilContext';
+import { RecoilRoot } from 'recoil';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
   <React.StrictMode>
-    <UtilProvider>
-      <App />
-    </UtilProvider>
+    <RecoilRoot>
+      <UtilProvider>
+        <App />
+      </UtilProvider>
+    </RecoilRoot>
   </React.StrictMode>
 );
 
