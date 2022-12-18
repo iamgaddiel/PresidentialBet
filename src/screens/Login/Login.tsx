@@ -1,10 +1,10 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonListHeader, IonPage, IonRouterLink, IonText, IonToast, IonToolbar } from "@ionic/react"
-import { atCircle, atSharp, eye, eyeOff, lockClosed, logoGoogle } from "ionicons/icons"
+import { IonButton, IonContent, IonIcon, IonInput, IonItem, IonList, IonPage, IonRouterLink, IonToast } from "@ionic/react"
+import { atSharp, lockClosed } from "ionicons/icons"
 import { useEffect, useRef, useState } from "react"
 
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useHistory } from "react-router";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 
 
@@ -25,7 +25,6 @@ const Login = () => {
     const history = useHistory()
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm<InputsType>();
-    console.log("🚀 ~ file: Login.tsx:28 ~ Login ~ errors", errors)
 
 
     /**
@@ -102,7 +101,7 @@ const Login = () => {
 
                             {/* email  */}
                             <IonItem class="ion-margin-vertical">
-                                <IonIcon icon={atSharp} slot='start' />
+                                <IonIcon icon={atSharp} slot='start' color='light'/>
                                 <IonInput
                                     type="email"
                                     {...register('email',
@@ -119,7 +118,7 @@ const Login = () => {
 
                             {/* Pssword */}
                             <IonItem class="ion-margin-vertical">
-                                <IonIcon icon={lockClosed} slot='start' />
+                                <IonIcon icon={lockClosed} slot='start' color='light' />
                                 <IonInput
                                     type="password"
                                     placeholder="Password"

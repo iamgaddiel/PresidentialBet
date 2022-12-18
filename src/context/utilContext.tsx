@@ -1,27 +1,54 @@
 import React, { createContext, useState } from 'react'
+import useSettings from '../hooks/useSetting';
 
-
-export type UtilProviderProps = {
-    children: any
-}
 
 export type UtilContextValues = {
-    showTabs: boolean,
-    setShowTabs: React.Dispatch<React.SetStateAction<boolean>>
+    showTabs: boolean;
+    setShowTabs: React.Dispatch<React.SetStateAction<boolean>>;
+    getImageThumbnail: (collectionId: string, recordId: string, filename: string, height: number, width: number) => string;
+    getImage: (collectionId: string, recordId: string, filename: string) => string;
 }
 
 export const UtilContext = createContext<UtilContextValues | null>(null);
 
 
 
-
-const UtilProvider = ({ children }: UtilProviderProps) => {
+const UtilProvider = ({ children }: any) => {
+    const { pbBaseUrl } = useSettings()
     const [showTabs, setShowTabs] = useState<boolean>(false);
+
+
+    /**
+     * @param collectionId 
+     * @param recordId 
+     * @param filename 
+     * @returns 
+     */
+    const getImage = (collectionId: string, recordId: string, filename: string) => {
+        const image = `${pbBaseUrl}/api/files/${collectionId}/${recordId}/${filename}`
+        return image
+    }
+
+    /**
+     * @param collectionId 
+     * @param recordId 
+     * @param filename 
+     * @param height 
+     * @param width 
+     * @returns 
+     */
+    const getImageThumbnail = (collectionId: string, recordId: string, filename: string, height: number, width: number) => {
+        const image = `${pbBaseUrl}/api/files/${collectionId}/${recordId}/${filename}?thumb=${width}x${height}`
+        return image
+    }
+
 
     return (
         <UtilContext.Provider value={{
             showTabs,
-            setShowTabs
+            setShowTabs,
+            getImage,
+            getImageThumbnail
         }}>
             {children}
         </UtilContext.Provider>

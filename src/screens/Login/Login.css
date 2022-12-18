@@ -1,5 +1,5 @@
 ion-content.background{
-    --background: url('../assets/images/auth_bg.jpg');
+    --background: url('../../assets/images/auth_bg.jpg');
     --background-repeat: no-repeat;
     --background-position: center;
     padding: 20px;
@@ -20,7 +20,7 @@ ion-content.background{
     font-size: 3rem;
 }
 .auth-section{
-    background-color: #ffffff;
+    background-color: #162746;
     border-radius: 30px 30px 0 0;
     position: absolute;
     z-index: 4;
@@ -29,7 +29,7 @@ ion-content.background{
     height: 100%;
 }
 .auth-section h2{
-    color: #7209b7
+    color: var(--secondary)
 }
 
 ion-button.google-btn{
@@ -39,16 +39,16 @@ ion-button.google-btn{
     text-transform: none;
 }
 ion-button.auth-button{
-    --background: #7209b7;
-    --color: #ffffff;
+    --background: var(--secondary);
+    --color: var(--primary);
     margin-top: 30px;
 }
 ion-router-link.forgot-password{
     --text-align: end !important;
-    --color: #7209b7
+    --color: var(--secondary)
 }
 .footer{
     text-align: center;
     margin-top: 2rem;
-    color: #717171
+    color: var(--tertiary)
 }

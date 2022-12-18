@@ -2,9 +2,9 @@ import { IonAvatar, IonBadge, IonButton, IonCard, IonContent, IonIcon, IonItem, 
 import { powerOutline, send } from 'ionicons/icons';
 import React, { useContext, useState } from 'react'
 import { useHistory } from 'react-router';
-import Header from '../components/Header'
-import { UtilContext, UtilContextValues } from '../context/utilContext';
-import useAuth from '../hooks/useAuth';
+import Header from '../../components/Header'
+import { UtilContext, UtilContextValues } from '../../context/utilContext';
+import useAuth from '../../hooks/useAuth';
 
 import './Profile.css';
 

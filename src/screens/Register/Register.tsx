@@ -1,14 +1,14 @@
-import { IonAlert, IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRouterLink, IonSelect, IonSelectOption, IonText, IonToast } from "@ionic/react"
-import { atSharp, eye, eyeOff, home, lockClosed, maleFemale, personSharp, phonePortraitOutline, print } from "ionicons/icons"
-import { useEffect, useRef, useState } from "react";
-import { useHistory, useLocation } from 'react-router-dom'
+import { IonAlert, IonButton, IonContent, IonIcon, IonInput, IonItem, IonList, IonPage, IonRouterLink, IonSelect, IonSelectOption, IonText, IonToast } from "@ionic/react"
+import { atSharp, eye, eyeOff, home, lockClosed, maleFemale, personSharp, phonePortraitOutline } from "ionicons/icons"
+import { useRef, useState } from "react";
+import { useHistory } from 'react-router-dom'
 
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { RegistrationFormType } from "../@types/forms";
-import useAuth from "../hooks/useAuth";
+import { RegistrationFormType } from "../../@types/forms";
+import useAuth from "../../hooks/useAuth";
 
 // Styles
-import './Login.css'
+import '../Login/Login.css'
 
 
 

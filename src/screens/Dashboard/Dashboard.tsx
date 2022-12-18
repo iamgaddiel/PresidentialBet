@@ -1,21 +1,21 @@
 import { IonButton, IonCard, IonCardContent, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonNavLink, IonPage, IonRouterLink } from '@ionic/react'
 import { addSharp, arrowForwardSharp } from 'ionicons/icons'
 import { useContext, useEffect } from 'react'
-import Header from '../components/Header'
-import ProfilePreview from '../components/ProfilePreview'
-import { UtilContext, UtilContextValues } from '../context/utilContext'
-import useAuth from '../hooks/useAuth'
+import Header from '../../components/Header'
+import ProfilePreview from '../../components/ProfilePreview'
+import { UtilContext, UtilContextValues } from '../../context/utilContext'
+import useAuth from '../../hooks/useAuth'
 
 import './Dashboard.css'
 
 
 const Dashboard = () => {
   const { setShowTabs } = useContext(UtilContext) as UtilContextValues
-  const { authUser } = useAuth()
+  const { authUser, pb } = useAuth()
 
   useEffect(() => {
     setShowTabs(true);
-  }, [])
+  }, [pb, setShowTabs])
 
   return (
     <IonPage>
@@ -34,7 +34,7 @@ const Dashboard = () => {
               </IonButton>
             </IonCardContent>
           </IonCard>
-        </section> 
+        </section>
 
         {/* Vote */}
         <section className="mt-4">

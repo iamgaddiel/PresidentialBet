@@ -1,5 +1,4 @@
-import { IonButton, IonContent, IonPage, IonTitle } from '@ionic/react'
-import React from 'react'
+import { IonButton, IonContent, IonPage } from '@ionic/react'
 
 // import Swiper core and required modules
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
@@ -14,18 +13,18 @@ import 'swiper/css/scrollbar';
 
 
 // types
-import { SlideType } from '../@types/landingSlide'
-import SingleLandingsSlide from '../components/SingleLandingsSlide';
+import { SlideType } from '../../@types/landingSlide'
+import SingleLandingsSlide from '../../components/SingleLandingsSlide';
 
 // style
 import './LandingPage.css'
 
 // Images
-import ElectionImg from '../assets/svg/undraw_election_day_w842.svg'
-import TeamImg from '../assets/svg/undraw_team_re_0bfe.svg'
-import PieChartImg from '../assets/images/pie-chart.png'
-import BarImg from '../assets/images/bars.png'
-import CardImg from '../assets/images/credit-cards-payment.png'
+import ElectionImg from '../../assets/svg/undraw_election_day_w842.svg'
+import TeamImg from '../../assets/svg/undraw_team_re_0bfe.svg'
+import PieChartImg from '../../assets/images/pie-chart.png'
+import BarImg from '../../assets/images/bars.png'
+import CardImg from '../../assets/images/credit-cards-payment.png'
 
 
 
@@ -74,8 +73,8 @@ const LandingPage = () => {
             onSlideChange={() => console.log('slide change')}
           >
             {
-              slideContent.map((item: SlideType) => (
-                <SwiperSlide>
+              slideContent.map((item: SlideType, indx) => (
+                <SwiperSlide key={indx}>
                   <SingleLandingsSlide title={item.title} image={item.image} desc={item.desc} />
                 </SwiperSlide>
               ))
@@ -85,7 +84,7 @@ const LandingPage = () => {
 
         <section className="buttons">
           <IonButton
-            className='create-button'
+            className='fill'
             size='large'
             fill='clear'
             routerDirection='forward'
@@ -97,7 +96,7 @@ const LandingPage = () => {
           </IonButton>
 
           <IonButton
-            className='login-button ion-margin-vertical'
+            className='outline ion-margin-vertical'
             size='large'
             fill='outline'
             expand='block'

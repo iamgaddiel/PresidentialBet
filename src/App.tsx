@@ -10,7 +10,7 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { closeCircleOutline, ellipse, home, homeOutline, people, personCircleOutline, square, statsChartOutline, thumbsUpOutline, timeOutline, triangle } from 'ionicons/icons';
+import { homeOutline, people, personCircleOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -30,17 +30,19 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import LandingPage from './pages/LandingPage';
-import { useContext, useState } from 'react';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import './global.css'
+import LandingPage from './screens/LandingPage/LandingPage';
+import { useContext } from 'react';
+import Login from './screens/Login/Login';
+import Register from './screens/Register/Register';
 import { UtilContext, UtilContextValues } from './context/utilContext';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './screens/Dashboard/Dashboard';
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Profile from './pages/Profile';
-import Candidates from './pages/Candidates';
+import Profile from './screens/Profile/Profile';
+import Candidates from './screens/Candidates/Candidates';
+import CandidateDetail from './screens/CandidateDetail/CandidateDetail';
 
 setupIonicReact();
 
@@ -66,6 +68,9 @@ const App: React.FC = () => {
         <Route exact path="/dashboard">
           <Dashboard />
         </Route>
+        <Route exact path="/candidate/:id">
+          <CandidateDetail />
+        </Route>
 
         {
           showTabs ? (
@@ -85,27 +90,27 @@ const App: React.FC = () => {
               <IonTabBar slot="bottom">
 
                 <IonTabButton tab="dashboard" href="/dashboard">
-                  <IonIcon icon={homeOutline} color='warning' />
+                  <IonIcon icon={homeOutline}  />
                   <IonLabel>Home</IonLabel>
                 </IonTabButton>
 
                 <IonTabButton tab="vote" href="/candidates">
-                  <IonIcon icon={people} color='warning' />
+                  <IonIcon icon={people}  />
                   <IonLabel>Candidates</IonLabel>
                 </IonTabButton>
 
                 <IonTabButton tab="history" href="/history">
-                  <IonIcon icon={timeOutline} color='warning' />
+                  <IonIcon icon={timeOutline}  />
                   <IonLabel>History</IonLabel>
                 </IonTabButton>
 
                 <IonTabButton tab="stats" href="/stats">
-                  <IonIcon icon={statsChartOutline} color='warning' />
+                  <IonIcon icon={statsChartOutline}  />
                   <IonLabel>Stats</IonLabel>
                 </IonTabButton>
 
                 <IonTabButton tab="profile" href="/profile">
-                  <IonIcon icon={personCircleOutline}  color='warning' />
+                  <IonIcon icon={personCircleOutline}   />
                   <IonLabel >Profile</IonLabel>
                 </IonTabButton>
 
