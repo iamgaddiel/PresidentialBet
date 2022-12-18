@@ -69,8 +69,7 @@ const CandidateDetail = () => {
                     <IonTitle>{candidate.fullname}</IonTitle>
                 </IonToolbar>
             </IonHeader>
-
-            <IonContent className='ion-padding'>
+            <IonContent className='ion-padding' fullscreen>
                 <IonImg src={getImage(candidate.collectionId, candidate.id, `${candidate.image}?thumb=0x100b`)} />
                 <section className='d-flex align-items-center justify-content-between row-reverse my-4'>
                     <IonLabel>
