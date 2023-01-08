@@ -1,0 +1,11 @@
+.profile_banner {
+    height: 12vh;
+}
+ion-content{
+    /* background-color: #f8f9fa; */
+}
+
+ion-card{
+    margin: 6px auto;
+    background-color: #f8f9fa;
+}

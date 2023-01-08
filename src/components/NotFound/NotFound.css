@@ -1,0 +1,24 @@
+.not_found_img_wrapper {
+    width: 50vw;
+    height: 25vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+.not_found_img_wrapper img {
+    width: 100%;
+    height: auto;
+}
+
+.not_found_wrapper{
+    /* height: 60vh; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ion-text.not_found_text{
+    color: var(--secondary)
+}

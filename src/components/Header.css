@@ -1,0 +1,6 @@
+
+/* TODO: Change toolbar colors */
+ion-toolbar{
+    --background-color: #F5C211;
+    color: #333333;
+}

@@ -1,0 +1,22 @@
+span.section_title{
+    color: var(--secondary)
+}
+.db.card{
+    background-color: var(--t-primary) !important;
+}
+.total-card{
+    background-color: var(--secondary) !important;
+    color: var(--tertiary)
+}
+
+.coin_img{
+    position: absolute;
+    width: 15.3rem;
+    left: -70px;
+    top: 20px;
+}
+
+.coin_img img{
+    width: 100%;
+    height: auto;
+}

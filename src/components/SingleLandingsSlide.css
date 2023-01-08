@@ -1,0 +1,32 @@
+.image-container{
+    display: flex;
+    height: 15rem;
+    width: 15rem;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+.image-container img{
+    width: 100%;
+    height: auto;
+}
+
+.title, .description{
+    text-align: center;
+    margin: 30px 0;
+}
+
+.title{
+    font-size: 2rem;
+}
+
+.description{
+    font-size: larger;
+    text-align: center;
+}
+
+.text-section{
+    width: 75vw;
+    margin: auto
+}

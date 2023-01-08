@@ -1,0 +1,33 @@
+.slide-container{
+    /* background-color: blue; */
+    text-align: center;
+    height: 60vh;
+    margin: 4.5rem 0;
+    color: var(--primary)
+}
+
+.buttons{
+    width: 70vw;
+    margin: auto;
+}
+
+ion-content.landing{
+    --background: var(--secondary);
+}
+
+/* ion-button.create-button{
+    --color: var(--primary);
+    --background: var(--secondary);
+}
+ion-button.create-button{
+    --color: var(--primary);
+    --background: var(--secondary);
+}
+ion-button.login-button{
+    --border-color: var(--secondary);
+    --color: var(--secondary);
+}
+ion-button.login-button:hover{
+    --background: var(--secondary);
+    --color: var(--secondary);
+} */

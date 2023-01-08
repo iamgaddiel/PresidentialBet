@@ -1,0 +1,65 @@
+:root {
+    --primary: #15233d;
+    --t-primary: #1e293ffe;
+    --secondary: #2afc75;
+    --tertiary: #f0f0f0;
+
+    --ion-text-color: var(--tertiary);
+    --ion-placeholder-color: var(--tertiary);
+    --ion-background-color: var(--primary);
+    --ion-toolbar-background: var(--primary);
+    --ion-toolbar-color: var(--secondary);
+    --ion-tab-bar-background: var(--primary);
+    --ion-tab-bar-color-selected: var(--secondary);
+    --ion-tab-bar-color: var(--tertiary);
+    --ion-tab-bar-border-color: transparent;
+    --ion-border-color: var(--secondary);
+    --ion-toolbar-border-color: var(--secondary);
+
+    @font-face {
+        font-family: 'Montserrat', sans-serif;
+        src: url('./assets/fonts/Montserrat-Light.ttf');
+        font-weight: normal;
+        font-style: normal;
+    }
+}
+
+* {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+ion-toolbar,
+ion-title {
+    --color: var(--secondary)
+}
+
+ion-button {
+    --color-hover: var(--primary)
+}
+
+ion-button.fill,
+ion-button.outline {
+    text-transform: capitalize;
+}
+
+ion-button.fill {
+    --background: var(--secondary);
+    --color: var(--primary);
+    --color-hover: var(--primary);
+}
+
+ion-button.fill:hover {
+    --border-color: var(--secondary);
+    --color: var(--secondary);
+}
+
+ion-button.outline {
+    --border-color: var(--secondary);
+    --background: var(--primary);
+    --color-hover: var(--primary);
+}
+
+ion-button.outline:hover {
+    --color: var(--secondary);
+    --background: var(--secondary);
+}

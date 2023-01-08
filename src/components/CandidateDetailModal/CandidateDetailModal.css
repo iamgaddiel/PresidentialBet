@@ -1,0 +1,19 @@
+.overlay{
+    height: 90%;
+    position: relative;
+    width: 100;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    z-index: 4 !important;
+}
+
+.overlay:after{
+    position: absolute;
+    content: "";
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    background-color: #000000d8 !important;
+}

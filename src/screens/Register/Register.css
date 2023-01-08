@@ -1,0 +1,6 @@
+.alert-radio-label, button.alert-button{
+    color: var(--secondary) !important;
+}
+ion-select{
+    color: var(--secondary) !important;
+}

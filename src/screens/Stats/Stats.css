@@ -1,0 +1,6 @@
+ion-search-bar::placeholder{
+    color: var(--secondary)
+}
+ion-search-bar{
+    outline: var(--secondary)
+}
