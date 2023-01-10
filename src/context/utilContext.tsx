@@ -18,25 +18,11 @@ const UtilProvider = ({ children }: any) => {
     const [showTabs, setShowTabs] = useState<boolean>(false);
 
 
-    /**
-     * @param collectionId 
-     * @param recordId 
-     * @param filename 
-     * @returns 
-     */
     const getImage = (collectionId: string, recordId: string, filename: string) => {
         const image = `${pbBaseUrl}/api/files/${collectionId}/${recordId}/${filename}`
         return image
     }
 
-    /**
-     * @param collectionId 
-     * @param recordId 
-     * @param filename 
-     * @param height 
-     * @param width 
-     * @returns 
-     */
     const getImageThumbnail = (collectionId: string, recordId: string, filename: string, height: number, width: number) => {
         const image = `${pbBaseUrl}/api/files/${collectionId}/${recordId}/${filename}?thumb=${width}x${height}`
         return image

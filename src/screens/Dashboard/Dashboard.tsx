@@ -1,9 +1,7 @@
-import { IonAvatar, IonButton, IonCard, IonCardContent, IonContent, IonIcon, IonImg, IonPage, IonRouterLink, IonSkeletonText } from '@ionic/react'
-import { addSharp, caretForward } from 'ionicons/icons'
+import { IonAvatar, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonList, IonListHeader, IonPage, IonRouterLink, IonSkeletonText, IonText } from '@ionic/react'
+import { caretForward, dice, timeOutline } from 'ionicons/icons'
 import { useContext, useEffect, useState } from 'react'
-import { useRecoilState } from 'recoil'
 import { CandidateType, UserCollectionType } from '../../@types/user'
-import { candidatesAtom } from '../../atom'
 import Header from '../../components/Header'
 import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useAuth from '../../hooks/useAuth'
@@ -20,6 +18,9 @@ import ProfilePreview from '../../components/ProfilePreview'
 import NotFound from '../../components/NotFound'
 
 import Coin from '../../assets/svg/blockchain.svg'
+import { useQuery } from 'react-query'
+import { CollectionContext, CollectionContextType } from '../../context/CollectionProvider'
+import { StakeCollectionType } from '../../@types/collections'
 
 
 const Dashboard = () => {
@@ -29,7 +30,7 @@ const Dashboard = () => {
   const { getCollectionList } = useCollection()
   const { DEBUG } = useSettings()
 
-  const [candidates, setCandidates] = useState<CandidateType[]>([])
+  // const [candidates, setCandidates] = useState<CandidateType[]>([])
   const [candidateDetail, setCandidateDetail] = useState<CandidateType>()
   const { getImage } = useContext(UtilContext) as UtilContextValues
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -37,28 +38,34 @@ const Dashboard = () => {
   const [userHistory, setUserHistory] = useState([])
 
 
+  // const queryClient = useQueryClient()
+  const { data, isLoading } = useQuery(CANDIDATES_COLLECTION, getAllCandidates)
+  const { UserStakes } = useContext(CollectionContext) as CollectionContextType
+
   const getUser = async () => {
     setAuthUser(await getStoredUser())
   }
 
-  const getAllCandidates = async () => {
-    getCollectionList(CANDIDATES_COLLECTION)
-      .then((networkResponse: any) => {
-        setCandidates(networkResponse)
-      })
+
+
+  async function getAllCandidates() {
+    const response = getCollectionList(CANDIDATES_COLLECTION)
+      .then((networkResponse: any) => networkResponse as CandidateType[])
       .catch(err => {
         throw new Error(err)
       })
+    console.log("🚀 ~ file: Dashboard.tsx:62 ~ getAllCandidates ~ response", response)
+    return response
   }
 
-  const getCandidateDetail = (candidateId: string) => {
-    let res = candidates?.find(person => person.id === candidateId)
+  function getCandidateDetail(candidateId: string) {
+    let res = data?.find((person: CandidateType) => person.id === candidateId)
     setCandidateDetail(res)
     setModalIsOpen(true)
   }
 
 
-  const handleSelection = () => {
+  function handleSelection() {
     setShowModal(true)
   }
 
@@ -79,6 +86,7 @@ const Dashboard = () => {
           authUser?.id! ? (
             <ProfilePreview
               firstName={authUser?.firstName!}
+              lastName={authUser?.lastName!}
               state={authUser?.state!}
             />
           ) : null
@@ -86,13 +94,23 @@ const Dashboard = () => {
 
         {/* Dashboard Banner */}
         <section className='my-4'>
-          <IonCard className='text-center text-dark py-3 total-card' style={{ position: "relative " }}>
+          <IonCard className='text-start text-dark py-3 total-card' style={{ position: "relative " }}>
             <div className="coin_img">
               <IonImg src={Coin} />
             </div>
             <IonCardContent>
-              <small style={{ textTransform: "uppercase" }}>Total Stake</small>
-              <h1 className='h1 fw-bold'>₦200000.00</h1>
+              <div className="d-flex justify-content-between align-item-center fw-bold">
+                <span>Total Stake</span>
+                <h1 className='h4'>₦ 0.00</h1>
+              </div>
+              <div className="d-flex justify-content-between align-item-center fw-bold">
+                <span>Total Payout</span>
+                <h1 className='h4'>₦ 0.00</h1>
+              </div>
+              <div className="d-flex justify-content-between align-item-center fw-bold">
+                <span>Odds</span>
+                <h1 className='h4'>1.88</h1>
+              </div>
             </IonCardContent>
           </IonCard>
         </section>
@@ -108,14 +126,14 @@ const Dashboard = () => {
           <section className="mt-2">
 
             {
-              candidates.length > 0 ? (
+              !isLoading ? (
                 <Swiper
                   modules={[Navigation, Pagination, Scrollbar, A11y]}
                   spaceBetween={20}
                   slidesPerView={3}
                 >
                   {
-                    candidates && candidates.map && candidates.map(({ image, id, fullname }) => (
+                    data && data.map(({ image, id, fullname }: CandidateType) => (
                       <SwiperSlide key={id}>
                         <div className="text-center mb-3 card db py-2 px-1" key={id} onClick={() => getCandidateDetail(id)}>
 
@@ -182,14 +200,65 @@ const Dashboard = () => {
           </IonRouterLink>
 
           {
-            userHistory.length === 0 ? (
-              <NotFound text='No History' />
-              // <div className='mt-4'>
-              //   <IonSkeletonText animated style={{ width: '100%', height: "70px", borderRadius: "20px", margin: "10px auto" }} />
-              //   <IonSkeletonText animated style={{ width: '100%', height: "70px", borderRadius: "20px", margin: "10px auto" }} />
-              //   <IonSkeletonText animated style={{ width: '100%', height: "70px", borderRadius: "20px", margin: "10px auto" }} />
-              // </div>
-            ) : null
+            UserStakes.isLoading ? (
+              <div className='mt-4'>
+                <IonSkeletonText animated style={{ width: '100%', height: "70px", borderRadius: "20px", margin: "10px auto" }} />
+                <IonSkeletonText animated style={{ width: '100%', height: "70px", borderRadius: "20px", margin: "10px auto" }} />
+                <IonSkeletonText animated style={{ width: '100%', height: "70px", borderRadius: "20px", margin: "10px auto" }} />
+              </div>
+            ) : (
+              <>
+                {
+                  UserStakes.data.length > 0 ? (
+                    <>
+                      <IonList lines='none'>
+                        <IonListHeader>
+                          <div className="d-flex justify-content-between aligns-item-center">
+                            <IonText>Total Stake</IonText>
+                            <IonIcon icon={timeOutline} color="success" />
+                          </div>
+                        </IonListHeader>
+                        {
+                          UserStakes && UserStakes.data.slice(0, 3).map((stake: StakeCollectionType) => (
+                            <IonItem>
+                              <IonCard className='stake_card'>
+                                <IonCardHeader>
+                                  <div className="d-flex align-items-center">
+                                    <div className="ion-margin-end">
+                                      <IonIcon icon={dice} color="success" size='large' />
+                                    </div>
+                                    <div>
+                                      <small className="text-light">{stake.created}</small>
+                                      <h4 className="text-light">{stake.id}</h4>
+                                    </div>
+                                  </div>
+                                </IonCardHeader>
+                                <IonCardContent>
+                                  <div className="d-flex justify-content-between algin-items-center">
+                                    <IonText>Stake....</IonText>
+                                    <IonText>{stake.stake}</IonText>
+                                  </div>
+                                  <div className="d-flex justify-content-between algin-items-center">
+                                    <IonText>Odds....</IonText>
+                                    <IonText>{stake.odd}</IonText>
+                                  </div>
+                                  <div className="d-flex justify-content-between algin-items-center">
+                                    <IonText>Payout....</IonText>
+                                    <IonText>₦ {stake.payout}</IonText>
+                                  </div>
+                                </IonCardContent>
+                              </IonCard>
+                            </IonItem>
+                          ))
+                        }
+                      </IonList>
+                    </>
+                  ) : (
+                    <NotFound text='No History' />
+                  )
+                }
+              </>
+            )
           }
         </section>
 

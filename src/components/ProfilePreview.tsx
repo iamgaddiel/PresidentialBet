@@ -4,10 +4,11 @@ import { location } from 'ionicons/icons'
 
 type ProfilePreviewType = {
     firstName: string;
+    lastName: string;
     state: string;
 }
 
-const ProfilePreview: React.FC<ProfilePreviewType> = ({ firstName, state }) => {
+const ProfilePreview: React.FC<ProfilePreviewType> = ({ firstName, lastName, state }) => {
 
     return (
         <div className='d-flex align-items-center justify-content-between'>
@@ -22,7 +23,7 @@ const ProfilePreview: React.FC<ProfilePreviewType> = ({ firstName, state }) => {
 
             <IonAvatar class='bg-light text-dark d-flex justify-content-center align-items-center'>
                 <span>
-                    <strong>{firstName['0']}</strong>
+                    <strong>{firstName['0']}{lastName[0]}</strong>
                 </span>
             </IonAvatar>
         </div>

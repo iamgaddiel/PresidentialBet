@@ -170,7 +170,7 @@ const Login = () => {
                                     disabled
                                 >
                                     <span className="spinner-border spinner-border-sm ion-margin-end" role="status" aria-hidden="true"></span>
-                                    Logging In...
+                                    Signing In....
                                 </IonButton>
                             )
                         }

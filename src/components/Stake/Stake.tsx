@@ -49,13 +49,13 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
 
 
         // * create stake daa
-        // addToCollection(STAKES_COLLECTION, data)
+        addToCollection(STAKES_COLLECTION, data)
 
         // // * update user properties
-        // updateCollection(USERS_COLLECTION, user?.id, {
-        //     hasSelected: true,
-        //     selected_candidate: candidate.id
-        // })
+        updateCollection(USERS_COLLECTION, user?.id, {
+            hasSelected: true,
+            selected_candidate: candidate.id
+        })
 
         // * increment candidate vote by 1
         let candidateVotes = subscribedCandidateDetail?.votes!
@@ -78,17 +78,6 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     }
 
 
-    useEffect(() => {
-        (
-            async () => {
-                let subRes = await subscribeToCollectionRecord(CANDIDATES_COLLECTION, candidate?.id) as any
-                console.log("🚀 ~ file: Stake.tsx:85 ~ subRes", subRes)
-                setSubscribedCandidateDetail(subRes)
-            }
-        )()
-    }, [])
-
-
     return (
         <form className="ion-padding">
 
@@ -105,7 +94,7 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
                 <label htmlFor="">
                     <small>Odd</small>
                 </label>
-                <h4>{subscribedCandidateDetail?.odds!}</h4>
+                <h4>{candidate?.odds!}</h4>
             </div>
 
             {/* Payout */}
@@ -136,7 +125,7 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
                     id="stake"
                     min={100}
                     className="m-0 p-0"
-                    style={{ fontSize: "22px"}}
+                    style={{ fontSize: "22px" }}
                     onIonChange={(e) => calculatePayout(parseInt(e.detail.value!))}
                 />
                 {

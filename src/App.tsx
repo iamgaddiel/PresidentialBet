@@ -48,103 +48,114 @@ import History from './screens/History';
 import Stats from './screens/Stats/Stats';
 import ForgotPassword from './screens/ForgotPassword';
 
+// ReactQuery
+import { QueryClient, QueryClientProvider } from 'react-query'
+import CollectionProvider from './context/CollectionProvider';
+
+
 setupIonicReact();
 
 const App: React.FC = () => {
   const { showTabs } = useContext(UtilContext) as UtilContextValues
+  const queryClient = new QueryClient()
+
 
   return (
-    <IonApp >
-      <IonReactRouter>
+    <QueryClientProvider client={queryClient}>
+      <CollectionProvider>
+        <IonApp >
+          <IonReactRouter>
 
-        <Route exact path="/home">
-          <LandingPage />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-        <Route exact path="/login">
-          <Login />
-        </Route>
-        <Route exact path="/register">
-          <Register />
-        </Route>
-        <Route exact path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route exact path="/accounts">
-          <Accounts />
-        </Route>
-        <Route exact path="/wallet">
-          <Wallet />
-        </Route>
-        <Route exact path="/history">
-          <History />
-        </Route>
-        <Route exact path="/stats">
-          <Stats />
-        </Route>
-        <Route exact path="/forgot-password">
-          <ForgotPassword />
-        </Route>
+            <Route exact path="/home">
+              <LandingPage />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+            <Route exact path="/login">
+              <Login />
+            </Route>
+            <Route exact path="/register">
+              <Register />
+            </Route>
+            <Route exact path="/dashboard">
+              <Dashboard />
+            </Route>
+            <Route exact path="/accounts">
+              <Accounts />
+            </Route>
+            <Route exact path="/wallet">
+              <Wallet />
+            </Route>
+            <Route exact path="/history">
+              <History />
+            </Route>
+            <Route exact path="/stats">
+              <Stats />
+            </Route>
+            <Route exact path="/forgot-password">
+              <ForgotPassword />
+            </Route>
 
-        {
-          showTabs ? (
-            <IonTabs>
-              <IonRouterOutlet>
-                <Route exact path="/dashboard">
-                  <Dashboard />
-                </Route>
-                <Route exact path="/profile">
-                  <Profile />
-                </Route>
-                <Route exact path="/user">
-                  <User />
-                </Route>
-                <Route exact path="/forgot-password">
-                  <ForgotPassword />
-                </Route>
-                {/* <Route exact path="/history">
+            {
+              showTabs ? (
+                <IonTabs>
+                  <IonRouterOutlet>
+                    <Route exact path="/dashboard">
+                      <Dashboard />
+                    </Route>
+                    <Route exact path="/profile">
+                      <Profile />
+                    </Route>
+                    <Route exact path="/user">
+                      <User />
+                    </Route>
+                    <Route exact path="/forgot-password">
+                      <ForgotPassword />
+                    </Route>
+                    {/* <Route exact path="/history">
                   <History />
                 </Route> */}
-                <Route exact path="/stats">
-                  <Stats />
-                </Route>
-                <Route exact path="/accounts">
-                  <Accounts />
-                </Route>
-                <Route exact path="/wallet">
-                  <Wallet />
-                </Route>
-              </IonRouterOutlet>
+                    <Route exact path="/stats">
+                      <Stats />
+                    </Route>
+                    <Route exact path="/accounts">
+                      <Accounts />
+                    </Route>
+                    <Route exact path="/wallet">
+                      <Wallet />
+                    </Route>
+                  </IonRouterOutlet>
 
-              <IonTabBar slot="bottom" translucent>
-                <IonTabButton tab="dashboard" href="/dashboard">
-                  <IonIcon icon={homeOutline} size='large' />
-                  <IonLabel>Home</IonLabel>
-                </IonTabButton>
+                  <IonTabBar slot="bottom" translucent>
+                    <IonTabButton tab="dashboard" href="/dashboard">
+                      <IonIcon icon={homeOutline} size='large' />
+                      <IonLabel>Home</IonLabel>
+                    </IonTabButton>
 
-                <IonTabButton tab="history" href="/history">
-                  <IonIcon icon={timeOutline} size='large' />
-                  <IonLabel>History</IonLabel>
-                </IonTabButton>
+                    <IonTabButton tab="history" href="/history">
+                      <IonIcon icon={timeOutline} size='large' />
+                      <IonLabel>History</IonLabel>
+                    </IonTabButton>
 
-                <IonTabButton tab="stats" href="/stats">
-                  <IonIcon icon={statsChartOutline} size='large' />
-                  <IonLabel>Stats</IonLabel>
-                </IonTabButton>
+                    <IonTabButton tab="stats" href="/stats">
+                      <IonIcon icon={statsChartOutline} size='large' />
+                      <IonLabel>Stats</IonLabel>
+                    </IonTabButton>
 
-                <IonTabButton tab="user" href="/user">
-                  <IonIcon icon={personCircleOutline} size='large' />
-                  <IonLabel >User</IonLabel>
-                </IonTabButton>
+                    <IonTabButton tab="user" href="/user">
+                      <IonIcon icon={personCircleOutline} size='large' />
+                      <IonLabel >Me</IonLabel>
+                    </IonTabButton>
 
-              </IonTabBar>
-            </IonTabs>
-          ) : null
-        }
-      </IonReactRouter>
-    </IonApp>
+                  </IonTabBar>
+                </IonTabs>
+              ) : null
+            }
+          </IonReactRouter>
+        </IonApp>
+      </CollectionProvider>
+    </QueryClientProvider>
   )
 }
 

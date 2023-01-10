@@ -39,9 +39,10 @@ const Profile = () => {
                 <section className="profile_banner text-center mb-5">
                     <div className=''>
                         <IonAvatar className='w-25 mx-auto bg-light text-dark p-5 d-flex justify-content-center align-items-center'>
-                            <h2>{user?.firstName['0']}</h2>
+                            <strong>{user?.firstName['0']}{user?.lastName['0']}</strong>
                         </IonAvatar>
-                        <small className='mt-3'>Change profile picture</small>
+                        <small className='mt-3' style={{ fontSize: "25px"}}>{user?.firstName} {user?.lastName}</small> <br />
+                        <small className='mt-3'>{user?.email}</small>
                         <p className="mt-2">
                             <span>
                                 {
@@ -56,7 +57,7 @@ const Profile = () => {
                     </div>
                 </section>
 
-                <section className='mt-5'>
+                <section className='mt-5' style={{ marginTop: "4rem"}}>
                     <IonList>
                         <IonItem className=''>
                             <IonLabel>
