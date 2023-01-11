@@ -1,0 +1,16 @@
+{
+  "name": "pg_backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "pocketbase": "^0.9.1",
+    "stripe": "^11.6.0"
+  }
+}

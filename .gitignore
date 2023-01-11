@@ -49,7 +49,7 @@ temp/
 .sourcemaps/
 .sass-cache/
 .tmp/
-hooks/
+# hooks/
 
 # Ionic 3 plugins files
 platforms/
@@ -220,3 +220,6 @@ pb_data/
 pb_data/data.db
 android/
 ios/
+
+pg_backend/node_modules
+pg_backend/.env

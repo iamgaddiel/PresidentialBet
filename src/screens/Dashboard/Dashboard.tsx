@@ -71,6 +71,7 @@ const Dashboard = () => {
 
 
   useEffect(() => {
+    console.log(UserStakes, '<----')
     setShowTabs(true);
     getUser()
     getAllCandidates()

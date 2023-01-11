@@ -1,0 +1,1 @@
+{"id":"b6b5237b-c9eb-48d0-bd33-4ab2e73e3589","space":47403,"runtime":"nodejs14.x","name":"pg_backend","path":"gl9dtt","project":"b0prttq2","account":"144798365827","region":"us-east-1","deps":["express@^4.18.2","stripe@^11.6.0"],"envs":null,"public":true,"log_level":"off","cron":""}

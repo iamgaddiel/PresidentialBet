@@ -83,32 +83,14 @@ const ForgotPassword = () => {
 
                     <div className="text-center ion-padding">
 
-
-                        {
-                            !isLoading ? (
-                                <IonButton
-                                    type="submit"
-                                    className="auth-button ion-margin-top fill"
-                                    fill="clear"
-                                    expand="block"
-                                    size="large"
-                                    shape="round"
-                                >Continue</IonButton>
-
-                            ) : (
-                                <IonButton
-                                    shape='round'
-                                    className="auth-button ion-margin-top fill"
-                                    fill="clear"
-                                    expand="block"
-                                    size="large"
-                                    disabled
-                                >
-                                    <span className="spinner-border spinner-border-sm ion-margin-end" role="status" aria-hidden="true"></span>
-                                    Send Link....
-                                </IonButton>
-                            )
-                        }
+                        <IonButton
+                            type="submit"
+                            className="auth-button ion-margin-top fill"
+                            fill="clear"
+                            expand="block"
+                            size="large"
+                            shape="round"
+                        >Continue</IonButton>
                     </div>
                 </form>
             </IonContent>
