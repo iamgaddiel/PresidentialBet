@@ -2,6 +2,7 @@ import useAuth from "./useAuth";
 
 const useCollection = () => {
   const { pb } = useAuth();
+  // pb.cancelRequest("collection")
 
   const getSingleCollection = async (collection: string, recordId: string) => {
     try {
@@ -12,7 +13,7 @@ const useCollection = () => {
   };
 
   const addToCollection = async (collection: string, data: any) => {
-    await pb.collection(collection).create(data);
+    await pb.collection(collection).create(data, { '$cancelKey': "collection" });
   };
 
   const getCollectionList = async (collection: string) => {
@@ -29,12 +30,12 @@ const useCollection = () => {
 
   const getFilteredCollection = async (
     collection: string,
-    filterParam: string
+    userId: string
   ) => {
     try {
       return await pb
         .collection(collection)
-        .getFirstListItem(`user="${filterParam}"`);
+        .getFirstListItem(`user="${userId}"`);
     } catch (err) {
       return err;
     }

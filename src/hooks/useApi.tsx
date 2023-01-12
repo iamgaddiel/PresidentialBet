@@ -5,7 +5,7 @@ const useApi = () => {
   const { _get, _post } = useHttp()
   const { DEBUG } = useSettings()
 
-  const SERVER_BASE_URL = (DEBUG) ? "http://localhost:8200" : "https://"
+  const SERVER_BASE_URL = (DEBUG) ? "http://localhost:8200" : "https://gl9dtt.deta.dev"
 
   const getStripePublishableKey = async () => { 
     let { stripePublishableKey } = await (await _get(`${SERVER_BASE_URL}/config`)).data

@@ -1,9 +1,10 @@
 import { IonModal, IonContent, IonAvatar, IonImg, IonButton, IonIcon } from '@ionic/react'
 import { thumbsUp } from 'ionicons/icons'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
+import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useCollection from '../../hooks/useCollection'
-import { CANDIDATES_COLLECTION, USERS_COLLECTION } from '../../keys'
+import { CANDIDATES_COLLECTION, STAKES_COLLECTION, USERS_COLLECTION } from '../../keys'
 import Stake from '../Stake'
 
 import "./CandidateDetailModal.css"
@@ -36,21 +37,39 @@ const CandidateDetailModal: React.FC<PropType> = ({
 
     const { pb, subscribeToCollectionRecord, unSubscribeFromCollection } = useCollection()
     const [subscribedUserData, setSubscribedUserData] = useState<UserCollectionType>(user)
-
-
+    const { addToCollection, updateCollection } = useCollection()
+    const { paymentData } = useContext(UtilContext) as UtilContextValues
+    
+    
     const closeModel = () => {
         pb.collection(CANDIDATES_COLLECTION).unsubscribe()
         unSubscribeFromCollection(USERS_COLLECTION)
         setModalIsOpen(false)
         setShowModal(false)
+
         
+        console.log("🚀 ~ file: CandidateDetailModal.tsx:42 ~ paymentData", paymentData)
+        
+        if (Object.keys(paymentData!).length > 0) {
+
+            // * create stake daa
+            addToCollection(STAKES_COLLECTION, paymentData)
+
+            // // * update user properties
+            updateCollection(USERS_COLLECTION, user?.id, {
+                hasSelected: true,
+                selected_candidate: candidate.id
+            })
+        }
+
+
     }
 
 
-    useEffect(() => {
-        const userSubRes = subscribeToCollectionRecord(USERS_COLLECTION, user?.id)
-        setSubscribedUserData(userSubRes as any)
-    }, [])
+    // useEffect(() => {
+    //     const userSubRes = subscribeToCollectionRecord(USERS_COLLECTION, user?.id)
+    //     setSubscribedUserData(userSubRes as any)
+    // }, [])
 
 
     return (

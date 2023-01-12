@@ -1,6 +1,6 @@
 import { IonInput, IonButton } from '@ionic/react'
 import { Record } from 'pocketbase'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
 import useCollection from '../../hooks/useCollection'
 import { CANDIDATES_COLLECTION, STAKES_COLLECTION, USERS_COLLECTION } from '../../keys'
@@ -10,6 +10,7 @@ import useApi from '../../hooks/useApi'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import PaymentForm from '../PaymentForm'
+import { PaymentDataType, UtilContext, UtilContextValues } from '../../context/utilContext'
 
 
 
@@ -40,12 +41,13 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     const [stripePromise, setStripePromise] = useState<any>()
     const [clientSecret, setClientSecret] = useState("")
     const [showPaymentModal, setShowPaymentModal] = useState(false)
+    const { setPaymentData } = useContext(UtilContext) as UtilContextValues
 
 
 
 
     const handleFormSubmission = async () => {
-        if (stake < 1000) {
+        if (stake < 100) {
             setShowError(true)
             return
         }
@@ -58,15 +60,7 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
             user: user?.id!
         }
 
-
-        // * create stake daa
-        addToCollection(STAKES_COLLECTION, data)
-
-        // // * update user properties
-        updateCollection(USERS_COLLECTION, user?.id, {
-            hasSelected: true,
-            selected_candidate: candidate.id
-        })
+        setPaymentData(data)
 
         // * stripe client key
         const secretKey = await getSecretKey(stake)
@@ -102,7 +96,7 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
                         {
                             clientSecret && stripePromise ? (
                                 <Elements stripe={stripePromise} options={{ clientSecret }}>
-                                    <PaymentForm closeModalFallback={() => closeModalFallback()}/>
+                                    <PaymentForm closeModalFallback={() => closeModalFallback()} />
                                 </Elements>
                             ) : null
                         }
@@ -113,58 +107,58 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
                     <form className="ion-padding">
 
                         {/* Candidate */}
-                        <div className="input_field" >
+                        <div className="input_field d-flex justify-content-between align-items-center" >
                             <label htmlFor="">
                                 <small>Candidate</small>
                             </label>
-                            <h4>{candidate?.fullname}</h4>
+                            <h5>{candidate?.fullname}</h5>
                         </div >
 
                         {/* Odd */}
-                        < div className="input_field" >
+                        < div className="input_field d-flex justify-content-between align-items-center" >
                             <label htmlFor="">
                                 <small>Odd</small>
                             </label>
-                            <h4>{candidate?.odds!}</h4>
+                            <h5>{candidate?.odds!}</h5>
                         </ div>
 
                         {/* Payout */}
-                        < div className="input_field" >
+                        < div className="input_field d-flex justify-content-between align-items-center" >
                             <label htmlFor="">
                                 <small>Total Payout</small>
                             </label>
-                            <h4>₦ {payout}</h4>
+                            <h5>₦ {payout}</h5>
                         </ div>
 
                         {/* Net Profit */}
-                        < div className="input_field" >
+                        < div className="input_field d-flex justify-content-between align-items-center" >
                             <label htmlFor="">
                                 <small>Net Payout</small>
                             </label>
-                            <h4>₦ {payout - stake}</h4>
+                            <h5>₦ {payout - stake}</h5>
                         </ div>
 
                         {/* Stake */}
-                        < div className="input_field" >
-                            <label htmlFor="stake">
+                        < div className="input_field">
+                            {/* <label htmlFor="">
                                 <small>Stake</small>
-                            </label>
+                            </label> */}
                             <IonInput
                                 type='text'
                                 inputMode='numeric'
-                                placeholder='1000.00'
+                                placeholder='Enter stake'
                                 id="stake"
                                 min={100}
-                                className="m-0 p-0"
+                                className="m-0 p-0 border mt-3 rounded border-success"
                                 style={{ fontSize: "22px" }}
                                 onIonChange={(e) => calculatePayout(parseInt(e.detail.value!))}
                             />
-                            {
-                                showError ? (
-                                    <span className="text-danger">stake can't be less than ₦1000</span>
-                                ) : null
-                            }
                         </ div>
+                        {
+                            showError ? (
+                                <span className="text-danger">stake can't be less than ₦100</span>
+                            ) : null
+                        }
 
 
                         <div className="text-center">

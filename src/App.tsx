@@ -113,9 +113,9 @@ const App: React.FC = () => {
                     <Route exact path="/forgot-password">
                       <ForgotPassword />
                     </Route>
-                    {/* <Route exact path="/history">
-                  <History />
-                </Route> */}
+                    <Route exact path="/history">
+                      <History />
+                    </Route>
                     <Route exact path="/stats">
                       <Stats />
                     </Route>

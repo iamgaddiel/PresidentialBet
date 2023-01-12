@@ -1,9 +1,14 @@
 // install express with `npm install express`
-import env from "dotenv";
-import PocketBase from "pocketbase";
-import express from "express";
-import { Stripe } from "stripe";
-import cors from "cors";
+// import env from "dotenv";
+// import PocketBase from "pocketbase";
+// import express from "express";
+// import { Stripe } from "stripe";
+// import cors from "cors";
+
+// import PocketBase from "pocketbase";
+const env = require("dotenv");
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 app.use(cors());
@@ -16,17 +21,20 @@ const DEBUG = true;
 const STRIP_PK = DEBUG
   ? process.env.STRIPE_TEST_PK
   : process.env.STRIPE_LIVE_PK;
-const STRIP_SK = DEBUG
+  const STRIP_SK = DEBUG
   ? process.env.STRIPE_TEST_SK
   : process.env.STRIPE_LIVE_SK;
-
-const stripe = Stripe(STRIP_SK);
+  
+  // stripe(STRIP_SK);
+  const stripe = require("stripe")(STRIP_SK);;
+  
+// const stripe = Stripe(STRIP_SK);
 
 const POCKETBASE_URL = DEBUG
   ? "https://presidential-game.pockethost.io"
   : "http://127.0.0.1:8090";
-
-const pb = new PocketBase(POCKETBASE_URL);
+  
+// const pb = new PocketBase(POCKETBASE_URL);
 
 /**
  *
@@ -34,12 +42,12 @@ const pb = new PocketBase(POCKETBASE_URL);
  * @returns
  */
 const convertCurrrency = (amount) => {
-  // return parseInt(amount / 700);
   return amount;
 };
 
 app.post("/make-payment", async (req, res) => {
   const { stake } = req.body;
+  // "type": "module",
 
   try {
     const paymentIntent = await stripe.paymentIntents.create({
@@ -49,6 +57,8 @@ app.post("/make-payment", async (req, res) => {
         enabled: true,
       },
     });
+    if (DEBUG) console.log("paymentIntent", paymentIntent);
+    if (DEBUG) console.log("paymentIntent Key", paymentIntent.client_secret);
 
     res.send({
       clientSecret: paymentIntent.client_secret,
@@ -77,3 +87,4 @@ app.listen(PORT, () => console.log("Started at port 8200"));
 
 // export 'app'
 // export default app;
+module.exports = app

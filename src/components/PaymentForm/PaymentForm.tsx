@@ -1,7 +1,6 @@
 import { IonButton } from '@ionic/react'
 import React, { useState } from 'react'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { useHistory } from 'react-router'
 
 
 type PropType = {
@@ -12,7 +11,6 @@ const PaymentForm: React.FC<PropType> = ({ closeModalFallback }) => {
     const [isLoading, setIsLoading] = useState(false)
     const stripe = useStripe()
     const elements = useElements()
-    const history = useHistory()
     const [infoMessage, setInfoMessage] = useState("")
 
 

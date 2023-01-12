@@ -6,7 +6,7 @@ import Header from '../../components/Header'
 import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
-import { CANDIDATES_COLLECTION } from '../../keys'
+import { CANDIDATES_COLLECTION, STAKES_COLLECTION } from '../../keys'
 import PlaceholderImage from '../../assets/images/card-media.png'
 
 import './Dashboard.css'
@@ -23,11 +23,17 @@ import { CollectionContext, CollectionContextType } from '../../context/Collecti
 import { StakeCollectionType } from '../../@types/collections'
 
 
+type CalculatedStakeType = {
+  totalStake: number;
+  totalPayout: number;
+  odds: number
+}
+
 const Dashboard = () => {
   const { setShowTabs } = useContext(UtilContext) as UtilContextValues
   const { getStoredUser, pb } = useAuth()
   const [authUser, setAuthUser] = useState<UserCollectionType>()
-  const { getCollectionList } = useCollection()
+  const { getCollectionList, getFilteredCollection } = useCollection()
   const { DEBUG } = useSettings()
 
   // const [candidates, setCandidates] = useState<CandidateType[]>([])
@@ -36,6 +42,7 @@ const Dashboard = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [showStakeModal, setShowModal] = useState(false)
   const [userHistory, setUserHistory] = useState([])
+  const [stake, setStake] = useState<CalculatedStakeType>()
 
 
   // const queryClient = useQueryClient()
@@ -54,7 +61,6 @@ const Dashboard = () => {
       .catch(err => {
         throw new Error(err)
       })
-    console.log("🚀 ~ file: Dashboard.tsx:62 ~ getAllCandidates ~ response", response)
     return response
   }
 
@@ -70,12 +76,27 @@ const Dashboard = () => {
   }
 
 
+  // todo: move to util
+  function calculateSum (arr: []){
+    return arr.reduce((x, y) => x + y, 0)
+  }
+
+  async function getUserStakeData() {
+    const res = await getFilteredCollection(STAKES_COLLECTION, authUser?.id!) as StakeCollectionType
+    // const payoutSum = 
+  }
+
+
   useEffect(() => {
     console.log(UserStakes, '<----')
     setShowTabs(true);
     getUser()
     getAllCandidates()
   }, [])
+
+  // useEffect(() => {
+  //   getUserStakeData()
+  // })
 
 
 
@@ -102,15 +123,18 @@ const Dashboard = () => {
             <IonCardContent>
               <div className="d-flex justify-content-between align-item-center fw-bold">
                 <span>Total Stake</span>
-                <h1 className='h4'>₦ 0.00</h1>
+                <h3 className='h3'>₦0</h3>
+                {/* <h3 className='h3'>₦ {stake?.totalStake}</h3> */}
               </div>
               <div className="d-flex justify-content-between align-item-center fw-bold">
                 <span>Total Payout</span>
-                <h1 className='h4'>₦ 0.00</h1>
+                <h3 className='h3'>₦0 </h3>
+                {/* <h3 className='h3'>₦ {stake?.totalPayout} </h3> */}
               </div>
               <div className="d-flex justify-content-between align-item-center fw-bold">
                 <span>Odds</span>
-                <h1 className='h4'>1.88</h1>
+                <h3 className='h3'>1.5</h3>
+                {/* <h3 className='h3'>{stake?.odds}</h3> */}
               </div>
             </IonCardContent>
           </IonCard>
