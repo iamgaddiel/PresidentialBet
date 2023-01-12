@@ -1,65 +1,79 @@
-// install express with `npm install express` 
-import {resolve} from 'path'
-import env from "dotenv"
-import PocketBase from 'pocketbase'
-import express from 'express'
-import stripe from "stripe"
-const app = express()
+// install express with `npm install express`
+import env from "dotenv";
+import PocketBase from "pocketbase";
+import express from "express";
+import { Stripe } from "stripe";
+import cors from "cors";
 
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-env.config({ path: './.env'})
+env.config({ path: "./.env" });
 
-const DEBUG = process.env.DEBUG
+const DEBUG = true;
 
-const STRIP_PK = (DEBUG) ? process.env.STRIPE_TEST_PK : process.env.STRIPE_TEST_SK
-const STRIP_SK = (DEBUG) ? process.env.STRIPE_LIVE_PK : process.env.STRIPE_LIVE_SK
+const STRIP_PK = DEBUG
+  ? process.env.STRIPE_TEST_PK
+  : process.env.STRIPE_LIVE_PK;
+const STRIP_SK = DEBUG
+  ? process.env.STRIPE_TEST_SK
+  : process.env.STRIPE_LIVE_SK;
 
+const stripe = Stripe(STRIP_SK);
 
-stripe(STRIP_SK);
+const POCKETBASE_URL = DEBUG
+  ? "https://presidential-game.pockethost.io"
+  : "http://127.0.0.1:8090";
 
+const pb = new PocketBase(POCKETBASE_URL);
 
-const POCKETBASE_URL = (DEBUG) ? "https://presidential-game.pockethost.io"  : "http://127.0.0.1:8090"
-const pb = new PocketBase(POCKETBASE_URL)
-
-
-const calculateOrderAmount = (items) => {
-  // Replace this constant with a calculation of the order's amount
-  // Calculate the order total on the server to prevent
-  // people from directly manipulating the amount on the client
-  return items;
+/**
+ *
+ * @param {int} amount
+ * @returns
+ */
+const convertCurrrency = (amount) => {
+  // return parseInt(amount / 700);
+  return amount;
 };
 
-app.post("/stake", async (req, res) => {
-  const { items } = req.body;
+app.post("/make-payment", async (req, res) => {
+  const { stake } = req.body;
 
-  // Create a PaymentIntent with the order amount and currency
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
-    currency: "ngn",
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      currency: "usd",
+      amount: convertCurrrency(stake),
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
 
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (err) {
+    return res.status(400).send({
+      error: {
+        message: err.message,
+      },
+    });
+  }
+});
+
+app.get("/", (req, res) => {
+  res.json({ status: "welcome" });
+});
+
+app.get("/config", (req, res) => {
   res.send({
-    clientSecret: paymentIntent.client_secret,
+    stripePublishableKey: STRIP_PK,
   });
 });
 
-app.get('/', (req, res) => {
-  res.json({ "status": "welcome"})
-})
-
-
-app.get('/config', (req, res) => {
-  res.send({
-    publishableKey: STRIP_PK
-  })
-})
-
-
-app.listen(8000, () => console.log("Started at port 8000"))
-
+const PORT = 8200;
+app.listen(PORT, () => console.log("Started at port 8200"));
 
 // export 'app'
-export default app
+// export default app;

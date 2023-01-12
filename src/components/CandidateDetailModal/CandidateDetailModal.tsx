@@ -43,6 +43,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
         unSubscribeFromCollection(USERS_COLLECTION)
         setModalIsOpen(false)
         setShowModal(false)
+        
     }
 
 
@@ -100,7 +101,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                 <Stake
                                     user={user}
                                     candidate={candidate}
-                                    closeModalFallback={closeModel}
+                                    closeModalFallback={() => closeModel()}
                                 />
                             )
                         }
