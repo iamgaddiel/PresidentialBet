@@ -77,7 +77,7 @@ const Dashboard = () => {
 
 
   // todo: move to util
-  function calculateSum (arr: []){
+  function calculateSum(arr: []) {
     return arr.reduce((x, y) => x + y, 0)
   }
 
@@ -88,7 +88,7 @@ const Dashboard = () => {
 
 
   useEffect(() => {
-    console.log(UserStakes, '<----')
+    console.log(UserStakes, '<----++')
     setShowTabs(true);
     getUser()
     getAllCandidates()
@@ -145,7 +145,7 @@ const Dashboard = () => {
         <section className="">
           <div className="mt-2 d-flex justify-content-between align-items-center">
             <span className="section_title">Candidates</span>
-            <IonIcon icon={caretForward} color={'success'} />
+            {/* <IonIcon icon={caretForward} color={'success'} /> */}
           </div>
 
           <section className="mt-2">
@@ -156,6 +156,7 @@ const Dashboard = () => {
                   modules={[Navigation, Pagination, Scrollbar, A11y]}
                   spaceBetween={20}
                   slidesPerView={3}
+                  pagination={{ clickable: true }}
                 >
                   {
                     data && data.map(({ image, id, fullname }: CandidateType) => (

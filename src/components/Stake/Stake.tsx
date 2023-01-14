@@ -1,16 +1,20 @@
 import { IonInput, IonButton } from '@ionic/react'
-import { Record } from 'pocketbase'
 import React, { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
 import useCollection from '../../hooks/useCollection'
-import { CANDIDATES_COLLECTION, STAKES_COLLECTION, USERS_COLLECTION } from '../../keys'
 import '../../screens/Login/Login.css'
-import useHttp from '../../hooks/useHttp'
 import useApi from '../../hooks/useApi'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import PaymentForm from '../PaymentForm'
-import { PaymentDataType, UtilContext, UtilContextValues } from '../../context/utilContext'
+import { UtilContext, UtilContextValues } from '../../context/utilContext'
+import Loader from '../Loader'
+import FlutterwavePayment from '../FlutterwavePayment'
+import useSettings from '../../hooks/useSetting'
+import useAuth from '../../hooks/useAuth'
+import { uuid } from "uuidv4"
+import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
+// import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 
 
 
@@ -32,16 +36,35 @@ type PropType = {
 const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     const [payout, setPayout] = useState<number>(0)
     const [stake, setStake] = useState(0)
-    const { addToCollection, updateCollection, subscribeToCollectionRecord } = useCollection()
     const [loading, setLoading] = useState(false)
     const [showError, setShowError] = useState(false)
-    const { pb } = useCollection()
     const [subscribedCandidateDetail, setSubscribedCandidateDetail] = useState<CandidateType>(candidate)
-    const { getStripePublishableKey, getSecretKey } = useApi()
-    const [stripePromise, setStripePromise] = useState<any>()
-    const [clientSecret, setClientSecret] = useState("")
-    const [showPaymentModal, setShowPaymentModal] = useState(false)
+    const [hasStaked, setHasStaked]  = useState(false)
+
     const { setPaymentData } = useContext(UtilContext) as UtilContextValues
+    const { FLUTTERWAVE_PK_KEY } = useSettings()
+
+    const flutterConfig = {
+        public_key: FLUTTERWAVE_PK_KEY,
+        tx_ref: `pg-${Date.now()}`,
+        amount: stake,
+        currency: 'NGN',
+        payment_options: 'card',
+        customer: {
+            email: user?.email!,
+            phone_number: user?.phone!,
+            name: `${user?.firstName!} ${user?.lastName!}`,
+        },
+        customizations: {
+            title: 'PresidentialGame Staking Payment',
+            description: 'Stake for favorite candidate',
+
+            // TODO link logo server
+            logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+        },
+    };
+
+    const handleFlutterPayment = useFlutterwave(flutterConfig);
 
 
 
@@ -53,6 +76,7 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
         }
 
         setLoading(true)
+
         const data: StakeDataType = {
             payout,
             candidate: candidate?.id!,
@@ -60,15 +84,26 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
             user: user?.id!
         }
 
-        setPaymentData(data)
-
-        // * stripe client key
-        const secretKey = await getSecretKey(stake)
-        setClientSecret(secretKey)
-
-        // display stripe modal
-        setShowPaymentModal(true)
-
+        // flutterwave
+        handleFlutterPayment({
+            callback: (response) => {
+                setPaymentData(data)
+                setHasStaked(true)
+                setLoading(false)
+                closeModalFallback()
+                closePaymentModal() // this will close the modal programmatically
+            },
+            onClose: () => {
+                setLoading(false)
+                closeModalFallback()
+            },
+        })
+        
+        if (!hasStaked){
+            setLoading(false)
+            setPaymentData(data)
+            closeModalFallback()
+        }
     }
 
 
@@ -80,114 +115,94 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
 
 
 
-    useEffect(() => {
-        (async () => {
-            const res = await getStripePublishableKey()
-            setStripePromise(loadStripe(res))
-        })()
-    }, [])
+    // useEffect(() => {
+    //     (async () => {
+    //         const res = await getStripePublishableKey()
+    //         setStripePromise(loadStripe(res))
+    //     })()
+    // }, [])
 
 
     return (
         <>
             {
-                showPaymentModal ? (
-                    <>
-                        {
-                            clientSecret && stripePromise ? (
-                                <Elements stripe={stripePromise} options={{ clientSecret }}>
-                                    <PaymentForm closeModalFallback={() => closeModalFallback()} />
-                                </Elements>
-                            ) : null
-                        }
-                    </>
+                loading ? (
+                    <Loader
+                        isOpen={loading}
+                        fallback={() => setLoading(false)}
+                        message={"Processing...."}
+                    />
+                ) : null
+            }
+            <form className="ion-padding">
 
-                ) : (
+                {/* Candidate */}
+                <div className="input_field d-flex justify-content-between align-items-center" >
+                    <label htmlFor="">
+                        <small>Candidate</small>
+                    </label>
+                    <h5>{candidate?.fullname}</h5>
+                </div >
 
-                    <form className="ion-padding">
+                {/* Odd */}
+                < div className="input_field d-flex justify-content-between align-items-center" >
+                    <label htmlFor="">
+                        <small>Odd</small>
+                    </label>
+                    <h5>{candidate?.odds!}</h5>
+                </ div>
 
-                        {/* Candidate */}
-                        <div className="input_field d-flex justify-content-between align-items-center" >
-                            <label htmlFor="">
-                                <small>Candidate</small>
-                            </label>
-                            <h5>{candidate?.fullname}</h5>
-                        </div >
+                {/* Payout */}
+                < div className="input_field d-flex justify-content-between align-items-center" >
+                    <label htmlFor="">
+                        <small>Total Payout</small>
+                    </label>
+                    <h5>₦ {payout}</h5>
+                </ div>
 
-                        {/* Odd */}
-                        < div className="input_field d-flex justify-content-between align-items-center" >
-                            <label htmlFor="">
-                                <small>Odd</small>
-                            </label>
-                            <h5>{candidate?.odds!}</h5>
-                        </ div>
+                {/* Net Profit */}
+                < div className="input_field d-flex justify-content-between align-items-center" >
+                    <label htmlFor="">
+                        <small>Net Payout</small>
+                    </label>
+                    <h5>₦ {payout - stake}</h5>
+                </ div>
 
-                        {/* Payout */}
-                        < div className="input_field d-flex justify-content-between align-items-center" >
-                            <label htmlFor="">
-                                <small>Total Payout</small>
-                            </label>
-                            <h5>₦ {payout}</h5>
-                        </ div>
-
-                        {/* Net Profit */}
-                        < div className="input_field d-flex justify-content-between align-items-center" >
-                            <label htmlFor="">
-                                <small>Net Payout</small>
-                            </label>
-                            <h5>₦ {payout - stake}</h5>
-                        </ div>
-
-                        {/* Stake */}
-                        < div className="input_field">
-                            {/* <label htmlFor="">
+                {/* Stake */}
+                < div className="input_field">
+                    {/* <label htmlFor="">
                                 <small>Stake</small>
                             </label> */}
-                            <IonInput
-                                type='text'
-                                inputMode='numeric'
-                                placeholder='Enter stake'
-                                id="stake"
-                                min={100}
-                                className="m-0 p-0 border mt-3 rounded border-success"
-                                style={{ fontSize: "22px" }}
-                                onIonChange={(e) => calculatePayout(parseInt(e.detail.value!))}
-                            />
-                        </ div>
-                        {
-                            showError ? (
-                                <span className="text-danger">stake can't be less than ₦100</span>
-                            ) : null
-                        }
+                    <IonInput
+                        type='text'
+                        inputMode='numeric'
+                        placeholder='Enter stake'
+                        id="stake"
+                        min={100}
+                        className="m-0 p-0 border mt-3 rounded border-success"
+                        style={{ fontSize: "22px" }}
+                        onIonChange={(e) => calculatePayout(parseInt(e.detail.value!))}
+                    />
+                </ div>
+                {
+                    showError ? (
+                        <span className="text-danger">stake can't be less than ₦100</span>
+                    ) : null
+                }
 
 
-                        <div className="text-center">
-                            {
-                                !loading ? (
-                                    <IonButton
-                                        shape='round'
-                                        className='mt-3 fill'
-                                        onClick={() => handleFormSubmission()}
-                                    >
-                                        Stake
-                                    </IonButton>
-
-                                ) : (
-                                    <IonButton
-                                        shape='round'
-                                        className='mt-3 fill'
-                                        disabled
-                                    >
-                                        <span className="spinner-border spinner-border-sm ion-margin-end" role="status" aria-hidden="true"></span>
-                                        Staking...
-                                    </IonButton>
-                                )
-                            }
-                        </div>
-                    </form >
-                )
-            }
+                <div className="text-center">
+                    <IonButton
+                        shape='round'
+                        className='mt-3 fill'
+                        onClick={() => handleFormSubmission()}
+                    >
+                        Stake
+                    </IonButton>
+                </div>
+            </form >
         </>
+
     )
 }
 

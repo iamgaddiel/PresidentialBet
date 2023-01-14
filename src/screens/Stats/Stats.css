@@ -1,6 +1,13 @@
-ion-search-bar::placeholder{
-    color: var(--secondary)
+.candidate_instance{
+    padding: 10px 0;
+    padding-left: 15px;
+    position: relative;
 }
-ion-search-bar{
-    outline: var(--secondary)
+.candidate_instance .candidate_stats_pg{
+    position: absolute;
+    background-color: var(--secondary);
+    inset: 0;
+    z-index: -1;
+    border-radius: 10px;
+    width: 0;
 }

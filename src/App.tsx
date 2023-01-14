@@ -1,5 +1,7 @@
+import { Network } from '@capacitor/network';
 import { Redirect, Route } from 'react-router-dom';
 import {
+  IonAlert,
   IonApp,
   IonIcon,
   IonLabel,
@@ -32,7 +34,7 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import './global.css'
 import LandingPage from './screens/LandingPage/LandingPage';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import Login from './screens/Login/Login';
 import Register from './screens/Register/Register';
 import { UtilContext, UtilContextValues } from './context/utilContext';
@@ -58,12 +60,32 @@ setupIonicReact();
 const App: React.FC = () => {
   const { showTabs } = useContext(UtilContext) as UtilContextValues
   const queryClient = new QueryClient()
+  const [isOpen, setIsOpen] = useState(false)
+
+
+  Network.addListener('networkStatusChange', status => {
+    console.log(status.connected, "<--- Network status")
+    if (!status.connected) {
+      setIsOpen(true)
+    }
+    // console.log('Network status changed', status);
+  });
+
+  // const logCurrentNetworkStatus = async () => {
+  //   const status = await Network.getStatus();
+
+  //   console.log('Network status:', status);
+  // };
 
 
   return (
     <QueryClientProvider client={queryClient}>
       <CollectionProvider>
         <IonApp >
+          <IonAlert isOpen={isOpen}
+            message="Hmm... you don't seem to be connected the internet"
+            onDidDismiss={() => setIsOpen(false)}
+          />
           <IonReactRouter>
 
             <Route exact path="/home">

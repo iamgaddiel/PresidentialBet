@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonImg, IonInput, IonItem, IonList, IonPage, IonRouterLink, IonToast } from "@ionic/react"
-import { atSharp, lockClosed } from "ionicons/icons"
+import { atSharp, flag, lockClosed } from "ionicons/icons"
 import { useContext, useEffect, useRef, useState } from "react"
 
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -88,6 +88,15 @@ const Login = () => {
                     onDidDismiss={() => setShowToast(false)}
                     duration={3000}
                 />
+                {
+                    !showLoader ? (
+                        <Loader
+                            isOpen={showLoader}
+                            message={"Sining in..."}
+                            fallback={() => setShowLoader(false)}
+                        />
+                    ) : null
+                }
                 <section className="heading">
                     <section className="d-flex align-items-center">
                         <IonImg src={Logo} alt="dice" className="mx-auto" />
@@ -148,32 +157,15 @@ const Login = () => {
                             {errors.email && <span className="text-danger">{errors.email.message}</span>} <br />
                             {errors.password && <span className="text-danger">{errors.password.message}</span>}
                         </section>
+                        <IonButton
+                            type="submit"
+                            className="auth-button ion-margin-top fill"
+                            fill="clear"
+                            expand="block"
+                            size="large"
+                            shape="round"
+                        >Login</IonButton>
 
-                        {
-                            !showLoader ? (
-                                <IonButton
-                                    type="submit"
-                                    className="auth-button ion-margin-top fill"
-                                    fill="clear"
-                                    expand="block"
-                                    size="large"
-                                    shape="round"
-                                >Login</IonButton>
-
-                            ) : (
-                                <IonButton
-                                    shape='round'
-                                    className="auth-button ion-margin-top fill"
-                                    fill="clear"
-                                    expand="block"
-                                    size="large"
-                                    disabled
-                                >
-                                    <span className="spinner-border spinner-border-sm ion-margin-end" role="status" aria-hidden="true"></span>
-                                    Signing In....
-                                </IonButton>
-                            )
-                        }
                     </form>
 
 

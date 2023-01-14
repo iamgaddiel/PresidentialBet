@@ -48,9 +48,9 @@ const CandidateDetailModal: React.FC<PropType> = ({
         setShowModal(false)
 
         
-        console.log("🚀 ~ file: CandidateDetailModal.tsx:42 ~ paymentData", paymentData)
+        console.log("🚀 ~ file: CandidateDetailModal.tsx:42 ~ paymentData", paymentData, typeof paymentData === "undefined" )
         
-        if (Object.keys(paymentData!).length > 0) {
+        if (typeof paymentData !== "undefined" && paymentData?.payout) {
 
             // * create stake daa
             addToCollection(STAKES_COLLECTION, paymentData)
@@ -120,7 +120,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                 <Stake
                                     user={user}
                                     candidate={candidate}
-                                    closeModalFallback={() => closeModel()}
+                                    closeModalFallback={closeModel}
                                 />
                             )
                         }

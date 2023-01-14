@@ -1,13 +1,15 @@
 import { IonButton } from '@ionic/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 
 
 type PropType = {
     closeModalFallback: () => void
+    // closeLoader: () => (value: React.SetStateAction<boolean>) => void
+    closeLoader: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PaymentForm: React.FC<PropType> = ({ closeModalFallback }) => {
+const PaymentForm: React.FC<PropType> = ({ closeModalFallback, closeLoader }) => {
     const [isLoading, setIsLoading] = useState(false)
     const stripe = useStripe()
     const elements = useElements()
@@ -33,11 +35,15 @@ const PaymentForm: React.FC<PropType> = ({ closeModalFallback }) => {
             closeModalFallback()
             // setInfoMessage(`${paymentIntent.status}`)
         } else {
-            setInfoMessage('Unexpected State')
+            // setInfoMessage('Unexpected State')
         }
 
 
     }
+
+    // useEffect(() =>{
+    //     closeLoader(false)
+    // }, [])
 
 
     return (

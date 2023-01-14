@@ -24,6 +24,9 @@ const STRIP_PK = DEBUG
   const STRIP_SK = DEBUG
   ? process.env.STRIPE_TEST_SK
   : process.env.STRIPE_LIVE_SK;
+
+
+  const FLUTTER_KY = DEBUG ? process.env.FLUTTER_WAVE_PK  :  process.env.FLUTTER_WAVE_SK
   
   // stripe(STRIP_SK);
   const stripe = require("stripe")(STRIP_SK);;
@@ -81,6 +84,14 @@ app.get("/config", (req, res) => {
     stripePublishableKey: STRIP_PK,
   });
 });
+
+
+app.get("/get-publishable-key", (req, res) => {
+  res.send({
+    fw_key: ""
+  })
+})
+
 
 const PORT = 8200;
 app.listen(PORT, () => console.log("Started at port 8200"));
