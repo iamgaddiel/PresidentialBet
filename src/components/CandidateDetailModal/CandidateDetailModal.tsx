@@ -3,8 +3,10 @@ import { thumbsUp } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
 import { UtilContext, UtilContextValues } from '../../context/utilContext'
+import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
-import { CANDIDATES_COLLECTION, STAKES_COLLECTION, USERS_COLLECTION } from '../../keys'
+import useStorage from '../../hooks/useStorage'
+import { CANDIDATES_COLLECTION, STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION } from '../../keys'
 import Stake from '../Stake'
 
 import "./CandidateDetailModal.css"
@@ -21,6 +23,7 @@ type PropType = {
     showStakeModal: boolean
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>
     image: string
+    getStoredUser: () => Promise<any>
 }
 
 const CandidateDetailModal: React.FC<PropType> = ({
@@ -32,52 +35,55 @@ const CandidateDetailModal: React.FC<PropType> = ({
     user,
     showStakeModal,
     setShowModal,
-    image
+    image,
+    getStoredUser
 }) => {
 
-    const { pb, subscribeToCollectionRecord, unSubscribeFromCollection } = useCollection()
-    const [subscribedUserData, setSubscribedUserData] = useState<UserCollectionType>(user)
+    const { subscribeToCollectionRecord, unSubscribeFromCollection } = useCollection()
+    const { pb, storeUser } = useAuth()
     const { addToCollection, updateCollection } = useCollection()
-    const { paymentData, setPaymentData } = useContext(UtilContext) as UtilContextValues
-    
-    
-    const closeModel = () => {
+    // const { paymentData, setPaymentData } = useContext(UtilContext) as UtilContextValues
+    const [_user, setUser] = useState<UserCollectionType>(user)
+    const { getItem, clearItems } = useStorage()
+
+
+    useEffect(() => {
+        setUser(user)
+    })
+
+
+
+    const closeModel = async () => {
         pb.collection(CANDIDATES_COLLECTION).unsubscribe()
         unSubscribeFromCollection(USERS_COLLECTION)
         setModalIsOpen(false)
         setShowModal(false)
 
-        
-        
-        if (typeof paymentData !== "undefined" && paymentData?.payout) {
-            console.log("🚀 ~ file: CandidateDetailModal.tsx:42 ~ paymentData", paymentData, typeof paymentData === "undefined" )
+        const paymentData = await getItem(STAKE_DATA)
 
-            // * create stake daa
+        console.log("🚀 ~ file: CandidateDetailModal.tsx:65 ~ closeModel ~ paymentData - Before", paymentData)
+        if (paymentData !== null) {
+        console.log("🚀 ~ file: CandidateDetailModal.tsx:65 ~ closeModel ~ paymentData - After", paymentData)
+
+            //  create stake daa
             addToCollection(STAKES_COLLECTION, paymentData)
 
-            // // * update user properties
-            updateCollection(USERS_COLLECTION, user?.id, {
+            //  update user properties
+            const updatedUserDeatail = await updateCollection(USERS_COLLECTION, user?.id, {
                 hasSelected: true,
                 selected_candidate: candidate.id
-            })
-            setPaymentData({
-                payout: 0,
-                candidate: "",
-                stake: 0,
-                user: ""
-            })
+            }) as UserCollectionType
+            storeUser(updatedUserDeatail)
+
+
+            setUser(updatedUserDeatail)
         }
 
-
+        // reset payment data
+        clearItems()
     }
 
 
-    
-    // useEffect(() => {
-    //     console.log(candidate, '<-- candidate data')
-    //     // const userSubRes = subscribeToCollectionRecord(USERS_COLLECTION, user?.id)
-    //     // setSubscribedUserData(userSubRes as any)
-    // }, [])
 
 
     return (
@@ -103,14 +109,25 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                     </section>
                                     <div className="text-center my-3">
                                         <span className="mt-5">{candidate?.fullname} </span>
-                                        <span className="mt-5">{candidate?.id === user?.selected_candidate ? "true": "false"}</span>
                                     </div>
 
                                     <p className="text-justify mt-y">{candidate?.description}</p>
 
                                     <div className='d-flex justify-content-center'>
                                         {
-                                            candidate?.id === user?.selected_candidate ? (
+                                            _user?.hasSelected && candidate?.id === _user?.selected_candidate ? (
+                                                <IonButton
+                                                    className='fill'
+                                                    shape='round'
+                                                    onClick={() => handleSelection(candidate?.id)}
+                                                >
+                                                    Continue
+                                                    <IonIcon icon={thumbsUp} color='dark' slot='end' />
+                                                </IonButton>
+                                            ) : null
+                                        }
+                                        {
+                                            !_user?.hasSelected ? (
                                                 <IonButton
                                                     className='fill'
                                                     shape='round'
@@ -123,13 +140,16 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                         }
                                     </div>
 
+
                                 </section>
 
                             ) : (
                                 <Stake
-                                    user={user}
+                                    user={_user}
                                     candidate={candidate}
                                     closeModalFallback={closeModel}
+                                    // loading={loading}
+                                    // setLoading={setLoading}
                                 />
                             )
                         }

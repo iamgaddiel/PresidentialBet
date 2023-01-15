@@ -49,11 +49,11 @@ const Dashboard = () => {
   const { data, isLoading } = useQuery(CANDIDATES_COLLECTION, getAllCandidates)
   const { UserStakes } = useContext(CollectionContext) as CollectionContextType
 
+
+
   const getUser = async () => {
     setAuthUser(await getStoredUser())
   }
-
-
 
   async function getAllCandidates() {
     const response = getCollectionList(CANDIDATES_COLLECTION)
@@ -213,6 +213,7 @@ const Dashboard = () => {
             showStakeModal={showStakeModal}
             setShowModal={setShowModal}
             image={getImage(CANDIDATES_COLLECTION, candidateDetail?.id!, candidateDetail?.image!)}
+            getStoredUser={getUser}
           />
 
         </section>

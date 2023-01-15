@@ -14,6 +14,8 @@ import useSettings from '../../hooks/useSetting'
 import useAuth from '../../hooks/useAuth'
 import { uuid } from "uuidv4"
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
+import useStorage from '../../hooks/useStorage'
+import { STAKE_DATA } from '../../keys'
 // import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 
 
@@ -30,16 +32,20 @@ type PropType = {
     candidate: CandidateType
     user: UserCollectionType
     closeModalFallback: () => void
+    loading?: boolean
+    setLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
 const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     const [payout, setPayout] = useState<number>(0)
     const [stake, setStake] = useState(0)
-    const [loading, setLoading] = useState(false)
     const [showError, setShowError] = useState(false)
     const [subscribedCandidateDetail, setSubscribedCandidateDetail] = useState<CandidateType>(candidate)
-    const [hasStaked, setHasStaked]  = useState(false)
+    const { storeItem } = useStorage()
+    const [hasStaked, setHasStaked] = useState(false)
+    const [loading, setLoading] = useState(false)
+
 
     const { setPaymentData } = useContext(UtilContext) as UtilContextValues
     const { FLUTTERWAVE_PK_KEY } = useSettings()
@@ -87,7 +93,8 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
         // flutterwave
         handleFlutterPayment({
             callback: (response) => {
-                setPaymentData(data)
+                storeItem(STAKE_DATA, data)
+                // setPaymentData(data)
                 setHasStaked(true)
                 setLoading(false)
                 closeModalFallback()
@@ -96,14 +103,16 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
             onClose: () => {
                 setLoading(false)
                 closeModalFallback()
-            },
+            }
         })
-        
-        if (!hasStaked){
+
+        if (!hasStaked) {
             setLoading(false)
             setPaymentData(data)
             closeModalFallback()
+            setHasStaked(false)
         }
+
     }
 
 
