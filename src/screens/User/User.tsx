@@ -8,7 +8,7 @@ import useAuth from '../../hooks/useAuth'
 
 
 const User = () => {
-    const { logoutUser, getStoredUser } = useAuth()
+    const { logoutUser, getStoredUser, deleteStoredUser } = useAuth()
     const [user, setUser] = useState<UserCollectionType>()
     const history = useHistory()
 
@@ -19,6 +19,7 @@ const User = () => {
 
     const deAuthenticateUser = () => {
         logoutUser()
+        deleteStoredUser()
         history.push("/login")
     }
 

@@ -1,5 +1,5 @@
-import { IonButton, IonCard, IonCardContent, IonContent, IonFooter, IonIcon, IonInput, IonLoading, IonPage, IonText, IonToast, IonToolbar } from "@ionic/react"
-import { warning } from "ionicons/icons"
+import { IonButton, IonCard, IonCardContent, IonContent, IonFooter, IonIcon, IonInput, IonLoading, IonPage, IonPopover, IonText, IonToast, IonToolbar } from "@ionic/react"
+import { warning, notifications } from "ionicons/icons"
 import { useEffect, useState } from "react"
 import BackHeader from "../../components/BackHeader"
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -41,7 +41,7 @@ const Accounts = () => {
     const [showAlert, setShowAlert] = useState(false)
     const [toastMsg, setToastMsg] = useState("")
     const [account, setAccount] = useState<BankAccountType>()
-    const { pb, verifyBvn, verifyUserAccount } = useAuth()
+    const { verifyBvn, verifyUserAccount, authUser } = useAuth()
     const { getFilteredCollection, addToCollection } = useCollection()
 
 
@@ -49,7 +49,7 @@ const Accounts = () => {
 
 
     const getUserAccount = () => {
-        const _account: any = getFilteredCollection(ACCOUNTS_COLLECTION, pb.authStore.model?.id!)
+        const _account: any = getFilteredCollection(ACCOUNTS_COLLECTION, authUser?.id!)
         if (typeof _account !== "undefined" && _account.hasOwnProperty("id")) {
             setAccount(_account)
             setAccountVerified(true)
@@ -61,35 +61,35 @@ const Accounts = () => {
 
     const handleFormSubmit: SubmitHandler<BankAccountInputType> = async (data) => {
         setLoading(true)
-        const accountDetail = { ...data, user: pb.authStore.model?.id! }
+        const accountDetail = { ...data, user: authUser?.id }
 
         try {
 
             // verify bvn
-            const bvnRes = await verifyBvn(accountDetail)
-            if (!bvnRes.data.status) {
-                setToastMsg(bvnRes.data.message)
-                setLoading(false)
-                setShowAlert(true)
-                return;
-            }
+            // const bvnRes = await verifyBvn(accountDetail)
+            // if (!bvnRes.data.status) {
+            //     setToastMsg(bvnRes.data.message)
+            //     setLoading(false)
+            //     setShowAlert(true)
+            //     return;
+            // }
 
             // verify account number
-            const _acc = await verifyUserAccount(data.account_number)
-            if (!_acc.data.status) {
-                setToastMsg('Invalid account number')
-                setLoading(false)
-                setShowAlert(true)
-                return;
-            }
+            // const _acc = await verifyUserAccount(data.account_number)
+            // if (!_acc.data.status) {
+            //     setToastMsg('Invalid account number')
+            //     setLoading(false)
+            //     setShowAlert(true)
+            //     return;
+            // }
 
             // verify account name
-            if (removeExcessiveSpaces(_acc.data.data.account_name) !== removeExcessiveSpaces(data.account_name)) {
-                setToastMsg('Account name and number mismatch')
-                setLoading(false)
-                setShowAlert(true)
-                return;
-            }
+            // if (removeExcessiveSpaces(_acc.data.data.account_name) !== removeExcessiveSpaces(data.account_name)) {
+            //     setToastMsg('Account name and number mismatch')
+            //     setLoading(false)
+            //     setShowAlert(true)
+            //     return;
+            // }
 
             addToCollection(ACCOUNTS_COLLECTION, accountDetail)
             getUserAccount()
@@ -98,7 +98,7 @@ const Accounts = () => {
         catch (err: any) {
             throw new Error(err)
         }
-        setLoading(true)
+        setLoading(false)
     }
 
 
@@ -112,7 +112,7 @@ const Accounts = () => {
             <IonContent fullscreen className='ion-padding'>
                 <IonLoading
                     isOpen={loading}
-                    message={"Verifying account details ...."}
+                    message={"Saving account details ...."}
                     spinner="circular"
                 />
                 <IonToast
@@ -233,7 +233,7 @@ const Accounts = () => {
                                 </div>
 
                                 <div className="text-center mt-4">
-                                    <IonButton type="submit" shape="round" className="fill">Verify</IonButton>
+                                    <IonButton type="submit" shape="round" expand="block" className="fill">Add</IonButton>
                                 </div>
                             </form>
                         </section>
@@ -307,7 +307,11 @@ const Accounts = () => {
                     <IonCard color="warning">
                         <IonCardContent>
                             <IonIcon icon={warning} color="warning" slot="start" />
-                            <IonText className="ion-margin-start">Bank details can not be update once verified!</IonText>
+                            <IonText className="ion-margin-start">Bank details can not be update once added. </IonText>
+                            <IonText>The specified account will be used for payment.</IonText>
+                            {/* <IonPopover trigger="click-trigger" triggerAction="click">
+                                <IonContent class="ion-padding"></IonContent>
+                            </IonPopover> */}
                         </IonCardContent>
                     </IonCard>
                 </IonToolbar>

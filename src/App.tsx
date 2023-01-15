@@ -9,6 +9,7 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
+  IonToast,
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -64,18 +65,11 @@ const App: React.FC = () => {
 
 
   Network.addListener('networkStatusChange', status => {
-    console.log(status.connected, "<--- Network status")
     if (!status.connected) {
       setIsOpen(true)
     }
-    // console.log('Network status changed', status);
+    setIsOpen(false)
   });
-
-  // const logCurrentNetworkStatus = async () => {
-  //   const status = await Network.getStatus();
-
-  //   console.log('Network status:', status);
-  // };
 
 
   return (
@@ -85,6 +79,8 @@ const App: React.FC = () => {
           <IonAlert isOpen={isOpen}
             message="Hmm... you don't seem to be connected the internet"
             onDidDismiss={() => setIsOpen(false)}
+            // position="top"
+            // color="danger"
           />
           <IonReactRouter>
 
@@ -114,6 +110,7 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/stats">
               <Stats />
+            duration={}
             </Route>
             <Route exact path="/forgot-password">
               <ForgotPassword />

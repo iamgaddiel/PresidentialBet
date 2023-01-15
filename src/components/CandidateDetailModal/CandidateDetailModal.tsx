@@ -38,7 +38,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
     const { pb, subscribeToCollectionRecord, unSubscribeFromCollection } = useCollection()
     const [subscribedUserData, setSubscribedUserData] = useState<UserCollectionType>(user)
     const { addToCollection, updateCollection } = useCollection()
-    const { paymentData } = useContext(UtilContext) as UtilContextValues
+    const { paymentData, setPaymentData } = useContext(UtilContext) as UtilContextValues
     
     
     const closeModel = () => {
@@ -48,9 +48,9 @@ const CandidateDetailModal: React.FC<PropType> = ({
         setShowModal(false)
 
         
-        console.log("🚀 ~ file: CandidateDetailModal.tsx:42 ~ paymentData", paymentData, typeof paymentData === "undefined" )
         
         if (typeof paymentData !== "undefined" && paymentData?.payout) {
+            console.log("🚀 ~ file: CandidateDetailModal.tsx:42 ~ paymentData", paymentData, typeof paymentData === "undefined" )
 
             // * create stake daa
             addToCollection(STAKES_COLLECTION, paymentData)
@@ -60,15 +60,23 @@ const CandidateDetailModal: React.FC<PropType> = ({
                 hasSelected: true,
                 selected_candidate: candidate.id
             })
+            setPaymentData({
+                payout: 0,
+                candidate: "",
+                stake: 0,
+                user: ""
+            })
         }
 
 
     }
 
 
+    
     // useEffect(() => {
-    //     const userSubRes = subscribeToCollectionRecord(USERS_COLLECTION, user?.id)
-    //     setSubscribedUserData(userSubRes as any)
+    //     console.log(candidate, '<-- candidate data')
+    //     // const userSubRes = subscribeToCollectionRecord(USERS_COLLECTION, user?.id)
+    //     // setSubscribedUserData(userSubRes as any)
     // }, [])
 
 
@@ -94,14 +102,15 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                         </div>
                                     </section>
                                     <div className="text-center my-3">
-                                        <span className="mt-5">{candidate?.fullname}</span>
+                                        <span className="mt-5">{candidate?.fullname} </span>
+                                        <span className="mt-5">{candidate?.id === user?.selected_candidate ? "true": "false"}</span>
                                     </div>
 
                                     <p className="text-justify mt-y">{candidate?.description}</p>
 
                                     <div className='d-flex justify-content-center'>
                                         {
-                                            !subscribedUserData?.hasSelected ? (
+                                            candidate?.id === user?.selected_candidate ? (
                                                 <IonButton
                                                     className='fill'
                                                     shape='round'

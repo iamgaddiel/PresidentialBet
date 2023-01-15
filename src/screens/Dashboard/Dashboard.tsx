@@ -77,26 +77,28 @@ const Dashboard = () => {
 
 
   // todo: move to util
-  function calculateSum(arr: []) {
-    return arr.reduce((x, y) => x + y, 0)
+  function calculateSum(item: {} | any) {
+    let sum = 0;
+    sum += item.a
+    return sum
   }
 
   async function getUserStakeData() {
     const res = await getFilteredCollection(STAKES_COLLECTION, authUser?.id!) as StakeCollectionType
-    // const payoutSum = 
+    console.log("🚀 ~ file: Dashboard.tsx:88 ~ getUserStakeData ~ res", res)
   }
 
 
   useEffect(() => {
-    console.log(UserStakes, '<----++')
+    // console.log(UserStakes, '<----++')
     setShowTabs(true);
     getUser()
     getAllCandidates()
   }, [])
 
-  // useEffect(() => {
-  //   getUserStakeData()
-  // })
+  useEffect(() => {
+    getUserStakeData()
+  }, [])
 
 
 

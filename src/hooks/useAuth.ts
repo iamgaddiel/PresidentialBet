@@ -68,6 +68,7 @@ const useAuth = () => {
     await storage.set(USER, user);
   };
 
+
   const getStoredUser = async () => {
     try {
       const user = await storage.get(USER);
@@ -77,6 +78,11 @@ const useAuth = () => {
     }
   };
 
+  const deleteStoredUser = async () => {
+    await storage.clear()
+  }
+
+  
   const verifyBvn = async (data: BankAccountInputType) => {
     try {
       const req = JSON.stringify({
@@ -130,7 +136,8 @@ const useAuth = () => {
     getStoredUser,
     verifyBvn,
     verifyUserAccount,
-    resetPassword
+    resetPassword,
+    deleteStoredUser
   };
 };
 
