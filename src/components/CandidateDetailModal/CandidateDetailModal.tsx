@@ -2,9 +2,9 @@ import { IonModal, IonContent, IonAvatar, IonImg, IonButton, IonIcon } from '@io
 import { thumbsUp } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
-import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
+import useSettings from '../../hooks/useSetting'
 import useStorage from '../../hooks/useStorage'
 import { CANDIDATES_COLLECTION, STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION } from '../../keys'
 import Stake from '../Stake'
@@ -36,34 +36,38 @@ const CandidateDetailModal: React.FC<PropType> = ({
     showStakeModal,
     setShowModal,
     image,
-    getStoredUser
 }) => {
 
-    const { subscribeToCollectionRecord, unSubscribeFromCollection } = useCollection()
-    const { pb, storeUser } = useAuth()
-    const { addToCollection, updateCollection } = useCollection()
-    // const { paymentData, setPaymentData } = useContext(UtilContext) as UtilContextValues
-    const [_user, setUser] = useState<UserCollectionType>(user)
+    const { pb, storeUser, getStoredUser } = useAuth()
     const { getItem, clearItems } = useStorage()
+    const { DEBUG } = useSettings()
+
+    const { addToCollection, updateCollection } = useCollection()
+    const [_user, setUser] = useState<UserCollectionType>(user)
+
 
 
     useEffect(() => {
-        setUser(user)
-    })
+        getCurrentUserDetail()
+    }, [])
 
 
+
+    async function getCurrentUserDetail() {
+        const res = await getStoredUser()
+        console.log("🚀 ~ file: CandidateDetailModal.tsx:59 ~ getCurrentUserDetail ~ res", res)
+        setUser(res)
+    }
 
     const closeModel = async () => {
         pb.collection(CANDIDATES_COLLECTION).unsubscribe()
-        unSubscribeFromCollection(USERS_COLLECTION)
         setModalIsOpen(false)
         setShowModal(false)
 
         const paymentData = await getItem(STAKE_DATA)
 
-        console.log("🚀 ~ file: CandidateDetailModal.tsx:65 ~ closeModel ~ paymentData - Before", paymentData)
         if (paymentData !== null) {
-        console.log("🚀 ~ file: CandidateDetailModal.tsx:65 ~ closeModel ~ paymentData - After", paymentData)
+            if (DEBUG) console.log("🚀 ~ file: CandidateDetailModal.tsx:65 ~ closeModel ~ paymentData - After", paymentData);
 
             //  create stake daa
             addToCollection(STAKES_COLLECTION, paymentData)
@@ -74,8 +78,6 @@ const CandidateDetailModal: React.FC<PropType> = ({
                 selected_candidate: candidate.id
             }) as UserCollectionType
             storeUser(updatedUserDeatail)
-
-
             setUser(updatedUserDeatail)
         }
 
@@ -148,8 +150,8 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                     user={_user}
                                     candidate={candidate}
                                     closeModalFallback={closeModel}
-                                    // loading={loading}
-                                    // setLoading={setLoading}
+                                // loading={loading}
+                                // setLoading={setLoading}
                                 />
                             )
                         }

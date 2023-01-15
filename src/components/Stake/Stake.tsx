@@ -1,22 +1,12 @@
 import { IonInput, IonButton } from '@ionic/react'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
-import useCollection from '../../hooks/useCollection'
 import '../../screens/Login/Login.css'
-import useApi from '../../hooks/useApi'
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from '@stripe/react-stripe-js'
-import PaymentForm from '../PaymentForm'
-import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import Loader from '../Loader'
-import FlutterwavePayment from '../FlutterwavePayment'
 import useSettings from '../../hooks/useSetting'
-import useAuth from '../../hooks/useAuth'
-import { uuid } from "uuidv4"
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 import useStorage from '../../hooks/useStorage'
 import { STAKE_DATA } from '../../keys'
-// import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 
 
 
@@ -38,17 +28,20 @@ type PropType = {
 
 
 const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
+    const [subscribedCandidateDetail, setSubscribedCandidateDetail] = useState<CandidateType>(candidate)
+    const { FLUTTERWAVE_PK_KEY } = useSettings()
+
+
     const [payout, setPayout] = useState<number>(0)
     const [stake, setStake] = useState(0)
     const [showError, setShowError] = useState(false)
-    const [subscribedCandidateDetail, setSubscribedCandidateDetail] = useState<CandidateType>(candidate)
     const { storeItem } = useStorage()
     const [hasStaked, setHasStaked] = useState(false)
     const [loading, setLoading] = useState(false)
+    
+    
 
 
-    const { setPaymentData } = useContext(UtilContext) as UtilContextValues
-    const { FLUTTERWAVE_PK_KEY } = useSettings()
 
     const flutterConfig = {
         public_key: FLUTTERWAVE_PK_KEY,
@@ -94,7 +87,6 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
         handleFlutterPayment({
             callback: (response) => {
                 storeItem(STAKE_DATA, data)
-                // setPaymentData(data)
                 setHasStaked(true)
                 setLoading(false)
                 closeModalFallback()
@@ -108,12 +100,11 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
 
         if (!hasStaked) {
             setLoading(false)
-            setPaymentData(data)
             closeModalFallback()
             setHasStaked(false)
         }
-
     }
+
 
 
     const calculatePayout = (currentStake: number = 100) => {
@@ -121,15 +112,6 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
         setStake(currentStake)
         setPayout(currentStake * subscribedCandidateDetail?.odds!)
     }
-
-
-
-    // useEffect(() => {
-    //     (async () => {
-    //         const res = await getStripePublishableKey()
-    //         setStripePromise(loadStripe(res))
-    //     })()
-    // }, [])
 
 
     return (
