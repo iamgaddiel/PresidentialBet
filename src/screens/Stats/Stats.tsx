@@ -1,4 +1,4 @@
-import { IonAvatar, IonContent, IonImg, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText } from '@ionic/react'
+import { IonAvatar, IonContent, IonImg, IonPage, IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText, RefresherEventDetail } from '@ionic/react'
 import { chevronDownCircleOutline, chevronDownCircle, close } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
@@ -65,12 +65,16 @@ const Stats = () => {
     }
 
 
-    function handleRefresh() {
-        getCalculatedStakes()
+    function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+        
+        setTimeout(() => {
+            getCalculatedStakes()
+            event.detail.complete();
+        }, 2000);
     }
 
     function isDark(range: number) {
-        if (range > 30) return "dark";
+        if (range > 90) return "dark";
         return "light"
     }
 
@@ -97,7 +101,7 @@ const Stats = () => {
                         <>
                             {
                                 candidates?.data && candidates?.data?.map((candidate: CandidateType) => (
-                                    <div className="candidate_instance rounded my-3 d-flex align-items-center" key={candidate?.id}>
+                                    <div className="candidate_instance rounded  d-flex align-items-center justify-content-end" key={candidate?.id}>
                                         {
                                             candidate?.id === omoyeleVotes?.candidateId &&
                                             <span className="candidate_stats_pg" style={{ width: `${omoyeleVotes?.votes}%` }}></span>
@@ -118,13 +122,7 @@ const Stats = () => {
                                             candidate?.id === peterVotes?.candidateId &&
                                             <span className="candidate_stats_pg" style={{ width: `${peterVotes?.votes}%` }}></span>
                                         }
-                                        <IonAvatar>
-                                            <IonImg
-                                                src={getImage(CANDIDATES_COLLECTION, candidate?.id, candidate?.image)}
-                                                alt={"candidates"}
-                                            />
-                                        </IonAvatar>
-                                        <div className="candidates_percentage ion-margin-start">
+                                        <div className="candidates_percentage ion-margin-start ion-margin-end">
                                             {
                                                 candidate?.id === omoyeleVotes?.candidateId ?
                                                     <h3 className={`text-${isDark(omoyeleVotes?.votes)}`}>{omoyeleVotes?.votes!}%</h3> :
@@ -151,6 +149,12 @@ const Stats = () => {
                                                     null
                                             }
                                         </div>
+                                        <IonAvatar>
+                                            <IonImg
+                                                src={getImage(CANDIDATES_COLLECTION, candidate?.id, candidate?.image)}
+                                                alt={"candidates"}
+                                            />
+                                        </IonAvatar>
                                     </div>
                                 ))
                             }

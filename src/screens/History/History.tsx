@@ -1,6 +1,6 @@
-import { IonAvatar, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSkeletonText, IonText } from '@ionic/react'
-import { dice, serverOutline, serverSharp, timeOutline } from 'ionicons/icons'
-import { useContext, useEffect } from 'react'
+import { IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonItem, IonList, IonListHeader, IonPage, IonSkeletonText, IonText } from '@ionic/react'
+import { dice, timeOutline } from 'ionicons/icons'
+import { useContext } from 'react'
 import { StakeCollectionType } from '../../@types/collections'
 import Header from '../../components/Header'
 import NotFound from '../../components/NotFound'
@@ -19,7 +19,7 @@ const History = () => {
                     !UserStakes.isLoading ? (
                         <>
                             {
-                                UserStakes.data.length < 1 ? (
+                                UserStakes.data?.length < 1 ? (
                                     <NotFound text="You don't have any transactions yet" />
                                 ) : (
                                     <>
@@ -28,12 +28,12 @@ const History = () => {
                                                 <div className="d-flex justify-content-between aligns-item-center">
                                                     <IonText>Total Stake</IonText>
                                                     <IonIcon icon={timeOutline} color="success" />
-                                                </div>
+                                                </div> 
                                             </IonListHeader>
                                             {
-                                                UserStakes && UserStakes.data.map((stake: StakeCollectionType) => (
+                                                UserStakes && UserStakes.data?.map((stake: StakeCollectionType) => (
 
-                                                    <IonItem>
+                                                    <IonItem key={stake.id}>
                                                         <IonCard className="stake_card">
                                                             <IonCardHeader>
                                                                 <div className="d-flex align-items-center">

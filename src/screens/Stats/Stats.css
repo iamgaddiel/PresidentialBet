@@ -2,6 +2,8 @@
     padding: 10px 0;
     padding-left: 15px;
     position: relative;
+    height: 10px;
+    margin: 4rem 0;
 }
 .candidate_instance .candidate_stats_pg{
     position: absolute;

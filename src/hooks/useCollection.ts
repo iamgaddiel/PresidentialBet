@@ -46,6 +46,7 @@ const useCollection = () => {
       return await pb.collection(collection).getFullList(1000, {
         sort: "-created",
         filter: `user="${userId}"`,
+        $autoCancel: false
       });
     } catch (err) {
       return err;

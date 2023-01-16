@@ -1,4 +1,4 @@
-import { IonAvatar, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonList, IonListHeader, IonPage, IonRouterLink, IonSkeletonText, IonText } from '@ionic/react'
+import { IonAvatar, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonList, IonListHeader, IonPage, IonRefresher, IonRefresherContent, IonRouterLink, IonSkeletonText, IonText, RefresherEventDetail } from '@ionic/react'
 import { caretForward, dice, timeOutline } from 'ionicons/icons'
 import { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
@@ -33,7 +33,7 @@ const Dashboard = () => {
   const { setShowTabs } = useContext(UtilContext) as UtilContextValues
   const { getStoredUser, pb } = useAuth()
   const [authUser, setAuthUser] = useState<UserCollectionType>()
-  const { getCollectionList, getFilteredCollection } = useCollection()
+  const { getCollectionList, getFilteredCollection, filterCollectionByUser } = useCollection()
   const { DEBUG } = useSettings()
 
   // const [candidates, setCandidates] = useState<CandidateType[]>([])
@@ -41,17 +41,35 @@ const Dashboard = () => {
   const { getImage } = useContext(UtilContext) as UtilContextValues
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [showStakeModal, setShowModal] = useState(false)
-  const [userHistory, setUserHistory] = useState([])
-  const [stake, setStake] = useState<CalculatedStakeType>()
+  const [stakes, setStakes] = useState<StakeCollectionType[]>([])
+  const [stakeSum, setSumStake] = useState(0)
+  const [selectedCandidateOdd, setSelectedCandidateOdd] = useState(0)
 
 
   // const queryClient = useQueryClient()
   const { data, isLoading } = useQuery(CANDIDATES_COLLECTION, getAllCandidates)
-  const { UserStakes } = useContext(CollectionContext) as CollectionContextType
+  const { UserStakes, getUserStakes } = useContext(CollectionContext) as CollectionContextType
+  const { getSingleCollection } = useCollection()
 
 
 
-  const getUser = async () => {
+
+  useEffect(() => {
+    setShowTabs(true);
+    getUser()
+    getAllCandidates()
+    getAllUserStakes()
+    calculateSumOfUserStakes()
+    // getSelectedCandidateOdd()
+  }, [])
+
+
+
+  async function getAllUserStakes() {
+    setStakes(await getUserStakes())
+  }
+
+  async function getUser() {
     setAuthUser(await getStoredUser())
   }
 
@@ -77,29 +95,34 @@ const Dashboard = () => {
 
 
   // todo: move to util
-  function calculateSum(item: {} | any) {
+  function calculateSum(item: StakeCollectionType) {
     let sum = 0;
-    sum += item.a
+    sum += item.stake
     return sum
   }
 
-  async function getUserStakeData() {
-    const res = await getFilteredCollection(STAKES_COLLECTION, authUser?.id!) as StakeCollectionType
-    console.log("🚀 ~ file: Dashboard.tsx:88 ~ getUserStakeData ~ res", res)
+  async function calculateSumOfUserStakes() {
+    // Calculated sum of all user stakes
+    const stakeSum: number = UserStakes.data?.map((item: StakeCollectionType) => calculateSum(item))
+      .reduce((x: number, y: number) => x + y, 0)
+    setSumStake(stakeSum)
+    getSelectedCandidateOdd()
+  }
+
+  async function getSelectedCandidateOdd() {
+    if (authUser?.hasSelected) {
+      const selectedCandidate = await getSingleCollection(CANDIDATES_COLLECTION, authUser?.selected_candidate) as CandidateType
+      setSelectedCandidateOdd(selectedCandidate?.odds!)
+    }
   }
 
 
-  useEffect(() => {
-    // console.log(UserStakes, '<----++')
-    setShowTabs(true);
-    getUser()
-    getAllCandidates()
-  }, [])
-
-  useEffect(() => {
-    getUserStakeData()
-  }, [])
-
+  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    setTimeout(() => {
+      getSelectedCandidateOdd()
+      event.detail.complete();
+    }, 2000);
+  }
 
 
   return (
@@ -116,29 +139,53 @@ const Dashboard = () => {
           ) : null
         }
 
+        <IonRefresher slot='fixed' onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
+
         {/* Dashboard Banner */}
         <section className='my-4'>
           <IonCard className='text-start text-dark py-3 total-card' style={{ position: "relative " }}>
             <div className="coin_img">
               <IonImg src={Coin} />
             </div>
-            <IonCardContent>
-              <div className="d-flex justify-content-between align-item-center fw-bold">
-                <span>Total Stake</span>
-                <h3 className='h3'>₦0</h3>
-                {/* <h3 className='h3'>₦ {stake?.totalStake}</h3> */}
-              </div>
-              <div className="d-flex justify-content-between align-item-center fw-bold">
-                <span>Total Payout</span>
-                <h3 className='h3'>₦0 </h3>
-                {/* <h3 className='h3'>₦ {stake?.totalPayout} </h3> */}
-              </div>
-              <div className="d-flex justify-content-between align-item-center fw-bold">
-                <span>Odds</span>
-                <h3 className='h3'>1.5</h3>
-                {/* <h3 className='h3'>{stake?.odds}</h3> */}
-              </div>
-            </IonCardContent>
+            {
+              !authUser?.hasSelected ? (
+                <IonCardContent>
+                  <div className="d-flex justify-content-between align-item-center fw-bold">
+                    <span>Total Stake</span>
+                    <h3 className='h3'>₦ 0</h3>
+                    {/* <h3 className='h3'>₦ {stake?.totalStake}</h3> */}
+                  </div>
+                  <div className="d-flex justify-content-between align-item-center fw-bold">
+                    <span>Total Payout</span>
+                    <h3 className='h3'>₦ 0 </h3>
+                    {/* <h3 className='h3'>₦ {stake?.totalPayout} </h3> */}
+                  </div>
+                  <div className="d-flex justify-content-between align-item-center fw-bold">
+                    <span>Odds</span>
+                    <h3 className='h3'>0</h3>
+                    {/* <h3 className='h3'>{stake?.odds}</h3> */}
+                  </div>
+                </IonCardContent>
+
+              ) : (
+                <IonCardContent>
+                  <div className="d-flex justify-content-between align-item-center fw-bold">
+                    <span>Total Stake</span>
+                    <h3 className='h3'>₦{stakeSum}</h3>
+                  </div>
+                  <div className="d-flex justify-content-between align-item-center fw-bold">
+                    <span>Total Payout</span>
+                    <h3 className='h3'>₦{stakeSum * selectedCandidateOdd} </h3>
+                  </div>
+                  <div className="d-flex justify-content-between align-item-center fw-bold">
+                    <span>Odds</span>
+                    <h3 className='h3'>{selectedCandidateOdd}</h3>
+                  </div>
+                </IonCardContent>
+              )
+            }
           </IonCard>
         </section>
 
@@ -248,9 +295,9 @@ const Dashboard = () => {
                           </div>
                         </IonListHeader>
                         {
-                          UserStakes && UserStakes.data.slice(0, 3).map((stake: StakeCollectionType) => (
-                            <IonItem>
-                              <IonCard className='stake_card'>
+                          UserStakes.data && UserStakes.data.slice(0, 3).map((stake: StakeCollectionType) => (
+                            <IonItem key={stake?.id}>
+                              <IonCard className='stake_card' key={stake.id}>
                                 <IonCardHeader>
                                   <div className="d-flex align-items-center">
                                     <div className="ion-margin-end">

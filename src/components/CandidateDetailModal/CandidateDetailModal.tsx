@@ -55,7 +55,6 @@ const CandidateDetailModal: React.FC<PropType> = ({
 
     async function getCurrentUserDetail() {
         const res = await getStoredUser()
-        console.log("🚀 ~ file: CandidateDetailModal.tsx:59 ~ getCurrentUserDetail ~ res", res)
         setUser(res)
     }
 
