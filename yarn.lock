@@ -1146,10 +1146,10 @@
   resolved "https://registry.yarnpkg.com/@capacitor/preferences/-/preferences-4.0.2.tgz#83bee8cadb3456a4f2a89118b8351d488c20ec77"
   integrity sha512-HgcRkMdVHSIV3TeQLZFmCaCeMWQ25wLyZZ7dA2f8Rw81Q1Nroxsi7HxTEGNqrWKSN9PNKBJD8vChr6eB2GNtZg==
 
-"@capacitor/splash-screen@^4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@capacitor/splash-screen/-/splash-screen-4.1.2.tgz#45f3bfd7653bed63a0a931550a1e891a03b789e8"
-  integrity sha512-uw37mfFtpXH6lBG0Lz6/ZRvbnn1XZ0lVOL7UHylvW4C/BUJRKHqPloCXNMeSBGuBkf5WdW7sdmKdGdp4J5fU9g==
+"@capacitor/splash-screen@^4.1.3":
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/splash-screen/-/splash-screen-4.1.3.tgz#3cf87e1c1095ac35a0d20495503605f396d73cb1"
+  integrity sha512-WkQQHFVK9kST+D8B0Z0jRGzZRQhtSKPhCkGez9dbOM+ggjCSjaXf90DK0nABbuNuO/99XAY6cJFkrZzw6erTBw==
 
 "@capacitor/status-bar@4.1.1":
   version "4.1.1"

@@ -8,13 +8,13 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 3000,
       launchAutoHide: true,
-      backgroundColor: "#ffffffff",
+      backgroundColor: "#15233d",
       androidSplashResourceName: "splash",
       // androidScaleType: "CENTER_CROP",
-      // showSpinner: true,
+      showSpinner: true,
       // androidSpinnerStyle: "large",
       // iosSpinnerStyle: "small",
-      // spinnerColor: "#999999",
+      spinnerColor: "#2afc75",
       splashFullScreen: true,
       splashImmersive: true,
       layoutName: "launch_screen",
@@ -25,7 +25,6 @@ const config: CapacitorConfig = {
   appName: 'PresidentialGame',
   webDir: 'build',
   bundledWebRuntime: false,
-  
 };
 
 export default config;

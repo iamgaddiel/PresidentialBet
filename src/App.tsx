@@ -59,6 +59,8 @@ import CollectionProvider from './context/CollectionProvider';
 setupIonicReact();
 
 const App: React.FC = () => {
+
+
   const { showTabs } = useContext(UtilContext) as UtilContextValues
   const queryClient = new QueryClient()
   const [isOpen, setIsOpen] = useState(false)
