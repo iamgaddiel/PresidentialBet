@@ -54,6 +54,7 @@ import ForgotPassword from './screens/ForgotPassword';
 // ReactQuery
 import { QueryClient, QueryClientProvider } from 'react-query'
 import CollectionProvider from './context/CollectionProvider';
+import Topup from './screens/Topup';
 
 
 setupIonicReact();
@@ -81,8 +82,8 @@ const App: React.FC = () => {
           <IonAlert isOpen={isOpen}
             message="Hmm... you don't seem to be connected the internet"
             onDidDismiss={() => setIsOpen(false)}
-            // position="top"
-            // color="danger"
+            translucent
+            mode='ios'
           />
           <IonReactRouter>
 
@@ -112,10 +113,13 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/stats">
               <Stats />
-            duration={}
+              duration={ }
             </Route>
             <Route exact path="/forgot-password">
               <ForgotPassword />
+            </Route>
+            <Route exact path="/topup">
+              <Topup />
             </Route>
 
             {
@@ -145,6 +149,9 @@ const App: React.FC = () => {
                     </Route>
                     <Route exact path="/wallet">
                       <Wallet />
+                    </Route>
+                    <Route exact path="/topup">
+                      <Topup />
                     </Route>
                   </IonRouterOutlet>
 

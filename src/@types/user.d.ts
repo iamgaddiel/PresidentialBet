@@ -41,6 +41,7 @@ export type UserCollectionType = {
   verified: boolean;
   hasSelected: boolean;
   selected_candidate: string;
+  wallet_balance: number
 };
 
 export type CandidateType = {

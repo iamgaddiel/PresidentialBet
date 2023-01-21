@@ -78,7 +78,7 @@ const Login = () => {
 
     return (
         <IonPage>
-            {/* <Loader isOpen={showLoader} message={"Loading..."} fallback={() => setShowLoader(false)} /> */}
+            <Loader isOpen={showLoader} message={"Loading...."} fallback={() => setShowLoader(false)} />
             <IonContent fullscreen className='background'>
                 <IonToast
                     isOpen={showToast}

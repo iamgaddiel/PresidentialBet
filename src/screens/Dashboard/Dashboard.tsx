@@ -1,12 +1,12 @@
-import { IonAvatar, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonList, IonListHeader, IonPage, IonRefresher, IonRefresherContent, IonRouterLink, IonSkeletonText, IonText, RefresherEventDetail } from '@ionic/react'
-import { caretForward, dice, timeOutline } from 'ionicons/icons'
+import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonItemDivider, IonList, IonListHeader, IonPage, IonRefresher, IonRefresherContent, IonRouterLink, IonSkeletonText, IonText, IonToast, RefresherEventDetail, useIonAlert } from '@ionic/react'
+import { card, caretForward, dice, timeOutline, wallet } from 'ionicons/icons'
 import { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
 import Header from '../../components/Header'
 import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
-import { CANDIDATES_COLLECTION, STAKES_COLLECTION } from '../../keys'
+import { CANDIDATES_COLLECTION, STAKES_COLLECTION, STAKE_DATA } from '../../keys'
 import PlaceholderImage from '../../assets/images/card-media.png'
 
 import './Dashboard.css'
@@ -21,6 +21,9 @@ import Coin from '../../assets/svg/blockchain.svg'
 import { useQuery } from 'react-query'
 import { CollectionContext, CollectionContextType } from '../../context/CollectionProvider'
 import { StakeCollectionType } from '../../@types/collections'
+import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
+import useStorage from '../../hooks/useStorage'
+import Loader from '../../components/Loader'
 
 
 type CalculatedStakeType = {
@@ -44,12 +47,20 @@ const Dashboard = () => {
   const [stakes, setStakes] = useState<StakeCollectionType[]>([])
   const [stakeSum, setSumStake] = useState(0)
   const [selectedCandidateOdd, setSelectedCandidateOdd] = useState(0)
+  const [openTopModal, setOpenTopModal] = useState(false)
+  const [topupAmount, setTopupAmount] = useState(100)
+  const [loading, setLoading] = useState(false)
+  const [displayAlertMessage, setDisplayAlertMessage] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
 
 
   // const queryClient = useQueryClient()
   const { data, isLoading } = useQuery(CANDIDATES_COLLECTION, getAllCandidates)
   const { UserStakes, getUserStakes } = useContext(CollectionContext) as CollectionContextType
   const { getSingleCollection } = useCollection()
+
+  const { storeItem } = useStorage()
+  const [displayTopupAlert] = useIonAlert()
 
 
 
@@ -62,6 +73,9 @@ const Dashboard = () => {
     calculateSumOfUserStakes()
     // getSelectedCandidateOdd()
   }, [])
+
+
+
 
 
 
@@ -129,6 +143,9 @@ const Dashboard = () => {
     <IonPage>
       <Header title={'Dashboard'} />
       <IonContent className='ion-padding'>
+
+
+        {/* ============================== ProfileProfile Starts ============================== */}
         {
           authUser?.id! ? (
             <ProfilePreview
@@ -138,10 +155,13 @@ const Dashboard = () => {
             />
           ) : null
         }
+        {/* ============================== ProfileProfile Ends ============================== */}
 
+        {/* ============================== Refresh Starts ============================== */}
         <IonRefresher slot='fixed' onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
+        {/* ============================== Refresh Ends ============================== */}
 
         {/* Dashboard Banner */}
         <section className='my-4'>
@@ -149,45 +169,65 @@ const Dashboard = () => {
             <div className="coin_img">
               <IonImg src={Coin} />
             </div>
-            {
-              !authUser?.hasSelected ? (
-                <IonCardContent>
-                  <div className="d-flex justify-content-between align-item-center fw-bold">
-                    <span>Total Stake</span>
-                    <h3 className='h3'>₦ 0</h3>
-                    {/* <h3 className='h3'>₦ {stake?.totalStake}</h3> */}
-                  </div>
-                  <div className="d-flex justify-content-between align-item-center fw-bold">
-                    <span>Total Payout</span>
-                    <h3 className='h3'>₦ 0 </h3>
-                    {/* <h3 className='h3'>₦ {stake?.totalPayout} </h3> */}
-                  </div>
-                  <div className="d-flex justify-content-between align-item-center fw-bold">
-                    <span>Odds</span>
-                    <h3 className='h3'>0</h3>
-                    {/* <h3 className='h3'>{stake?.odds}</h3> */}
-                  </div>
-                </IonCardContent>
+            {/* ============================== Banner Starts ============================== */}
 
-              ) : (
-                <IonCardContent>
-                  <div className="d-flex justify-content-between align-item-center fw-bold">
-                    <span>Total Stake</span>
-                    <h3 className='h3'>₦{stakeSum}</h3>
+
+            <IonCardContent>
+              <div className="d-flex justify-content-between align-item-center fw-bold">
+                <span className='d-flex align-items-center h5'>
+                  <IonIcon icon={wallet} size="default" /> { }
+                  Balance
+                </span>
+                <h2 className='h2'>₦ {authUser?.wallet_balance}</h2>
+              </div>
+              {
+                !authUser?.hasSelected ? (
+                  <div className='mt-2'>
+                    <div className="d-flex justify-content-between align-item-center fw-bold">
+                      <span>Total Stake</span>
+                      <h3 className='h3'>₦ 0</h3>
+                    </div>
+                    <div className="d-flex justify-content-between align-item-center fw-bold">
+                      <span>Total Payout</span>
+                      <h3 className='h3'>₦ 0 </h3>
+                    </div>
+                    <div className="d-flex justify-content-between align-item-center fw-bold">
+                      <span>Odds</span>
+                      <h3 className='h3'>0</h3>
+                    </div>
                   </div>
-                  <div className="d-flex justify-content-between align-item-center fw-bold">
-                    <span>Total Payout</span>
-                    <h3 className='h3'>₦{stakeSum * selectedCandidateOdd} </h3>
-                  </div>
-                  <div className="d-flex justify-content-between align-item-center fw-bold">
-                    <span>Odds</span>
-                    <h3 className='h3'>{selectedCandidateOdd}</h3>
-                  </div>
-                </IonCardContent>
-              )
-            }
+                ) : (
+                  <>
+                    <div className="d-flex justify-content-between align-item-center fw-bold">
+                      <span>Total Stake</span>
+                      <h3 className='h3'>₦{stakeSum}</h3>
+                    </div>
+                    <div className="d-flex justify-content-between align-item-center fw-bold">
+                      <span>Total Payout</span>
+                      <h3 className='h3'>₦{stakeSum * selectedCandidateOdd} </h3>
+                    </div>
+                    <div className="d-flex justify-content-between align-item-center fw-bold">
+                      <span>Odds</span>
+                      <h3 className='h3'>{selectedCandidateOdd}</h3>
+                    </div>
+                  </>
+                )
+              }
+
+              <IonButton
+                expand='block'
+                className='mt-4 text-light text-capitalize'
+                fill='default'
+                routerDirection='forward'
+                routerLink='/topup'
+              >
+                <IonIcon icon={card} color={"light"} slot="end" />
+                Top up
+              </IonButton>
+            </IonCardContent>
           </IonCard>
         </section>
+        {/* ============================== BAnner Ends ============================== */}
 
 
         {/* Candidates */}
@@ -340,7 +380,7 @@ const Dashboard = () => {
 
 
       </IonContent>
-    </IonPage>
+    </IonPage >
   )
 }
 

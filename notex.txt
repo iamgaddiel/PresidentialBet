@@ -1,2 +1,33 @@
 FLUTTERWAVE TEST CARD
 5531886652142950	564	3310	09/32	12345
+
+// flutterwave
+// handleFlutterPayment({
+//   callback: (response) => {
+//     setLoading(false)
+//     setShowTopupIsOpen(false)
+//     closePaymentModal() // this will close the modal programmatically
+//   },
+//   onClose: () => {
+//     setLoading(false)
+//   }
+// })
+
+3 stds
+
+-> 
+mobile
+flag sites
+60k
+
+->
+health emergecy 
+
+
+-> 
+
+
+
+->
+
+
