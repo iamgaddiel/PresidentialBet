@@ -47,11 +47,6 @@ const Dashboard = () => {
   const [stakes, setStakes] = useState<StakeCollectionType[]>([])
   const [stakeSum, setSumStake] = useState(0)
   const [selectedCandidateOdd, setSelectedCandidateOdd] = useState(0)
-  const [openTopModal, setOpenTopModal] = useState(false)
-  const [topupAmount, setTopupAmount] = useState(100)
-  const [loading, setLoading] = useState(false)
-  const [displayAlertMessage, setDisplayAlertMessage] = useState(false)
-  const [alertMessage, setAlertMessage] = useState("")
 
 
   // const queryClient = useQueryClient()
@@ -67,11 +62,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     setShowTabs(true);
+    handleRefresh()
     getUser()
     getAllCandidates()
-    getAllUserStakes()
+    
+    getSelectedCandidateOdd()
     calculateSumOfUserStakes()
-    // getSelectedCandidateOdd()
+    
   }, [])
 
 
@@ -80,11 +77,12 @@ const Dashboard = () => {
 
 
   async function getAllUserStakes() {
-    setStakes(await getUserStakes())
+    setStakes(await getUserStakes(authUser?.id!))
   }
 
   async function getUser() {
-    setAuthUser(await getStoredUser())
+    const res = await getStoredUser()
+    setAuthUser(res)
   }
 
   async function getAllCandidates() {
@@ -118,24 +116,28 @@ const Dashboard = () => {
   async function calculateSumOfUserStakes() {
     // Calculated sum of all user stakes
     const stakeSum: number = UserStakes.data?.map((item: StakeCollectionType) => calculateSum(item))
-      .reduce((x: number, y: number) => x + y, 0)
+    .reduce((x: number, y: number) => x + y, 0)
     setSumStake(stakeSum)
-    getSelectedCandidateOdd()
+    // getSelectedCandidateOdd()
   }
 
   async function getSelectedCandidateOdd() {
     if (authUser?.hasSelected) {
       const selectedCandidate = await getSingleCollection(CANDIDATES_COLLECTION, authUser?.selected_candidate) as CandidateType
+      console.log("🚀 ~ file: Dashboard.tsx:124 ~ getSelectedCandidateOdd ~ selectedCandidate", selectedCandidate)
       setSelectedCandidateOdd(selectedCandidate?.odds!)
     }
   }
 
-
-  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+  // 
+  function handleRefresh(event?: CustomEvent<RefresherEventDetail>) {
     setTimeout(() => {
       getSelectedCandidateOdd()
-      event.detail.complete();
-    }, 2000);
+      getAllUserStakes()
+      calculateSumOfUserStakes()
+      getUser()
+      event?.detail.complete();
+    }, 2500);
   }
 
 
@@ -178,22 +180,22 @@ const Dashboard = () => {
                   <IonIcon icon={wallet} size="default" /> { }
                   Balance
                 </span>
-                <h2 className='h2'>₦ {authUser?.wallet_balance}</h2>
+                <h2 className='h2'>₦ {authUser?.wallet_balance!}</h2>
               </div>
               {
                 !authUser?.hasSelected ? (
                   <div className='mt-2'>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Total Stake</span>
-                      <h3 className='h3'>₦ 0</h3>
+                      <IonSkeletonText animated style={{ width: "50px"}} />
                     </div>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Total Payout</span>
-                      <h3 className='h3'>₦ 0 </h3>
+                      <IonSkeletonText animated style={{ width: "50px"}} />
                     </div>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Odds</span>
-                      <h3 className='h3'>0</h3>
+                      <IonSkeletonText animated style={{ width: "50px"}} />
                     </div>
                   </div>
                 ) : (

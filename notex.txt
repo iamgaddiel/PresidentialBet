@@ -10,7 +10,7 @@ FLUTTERWAVE TEST CARD
 //   },
 //   onClose: () => {
 //     setLoading(false)
-//   }
+//   }:
 // })
 
 3 stds

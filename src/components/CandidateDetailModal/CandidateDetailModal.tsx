@@ -1,6 +1,7 @@
 import { IonModal, IonContent, IonAvatar, IonImg, IonButton, IonIcon } from '@ionic/react'
-import { thumbsUp } from 'ionicons/icons'
+import { alert, thumbsUp } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
+import { StakeDataType } from '../../@types/collections'
 import { CandidateType, UserCollectionType } from '../../@types/user'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
@@ -63,22 +64,20 @@ const CandidateDetailModal: React.FC<PropType> = ({
         setModalIsOpen(false)
         setShowModal(false)
 
-        const paymentData = await getItem(STAKE_DATA)
+        const paymentData = await getItem(STAKE_DATA) as StakeDataType
+        console.log("🚀 ~ file: CandidateDetailModal.tsx:68 ~ closeModel ~ paymentData", paymentData)
 
-        if (paymentData !== null) {
-            if (DEBUG) console.log("🚀 ~ file: CandidateDetailModal.tsx:65 ~ closeModel ~ paymentData - After", paymentData);
 
-            //  create stake daa
-            addToCollection(STAKES_COLLECTION, paymentData)
+        //  create stake daa
+        addToCollection(STAKES_COLLECTION, paymentData)
 
-            //  update user properties
-            const updatedUserDeatail = await updateCollection(USERS_COLLECTION, user?.id, {
-                hasSelected: true,
-                selected_candidate: candidate.id
-            }) as UserCollectionType
-            storeUser(updatedUserDeatail)
-            setUser(updatedUserDeatail)
-        }
+        //  update user properties
+        const updatedUserDeatail = await updateCollection(USERS_COLLECTION, user?.id, {
+            hasSelected: true,
+            selected_candidate: candidate.id
+        }) as UserCollectionType
+        storeUser(updatedUserDeatail)
+        setUser(updatedUserDeatail)
 
         // reset payment data
         clearItems()

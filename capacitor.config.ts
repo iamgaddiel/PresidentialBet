@@ -21,7 +21,7 @@ const config: CapacitorConfig = {
       useDialog: true,
     },
   },
-  appId: 'com.thisrupt.PresidentialGame',
+  appId: 'com.thisruptcode.PresidentialGame',
   appName: 'PresidentialGame',
   webDir: 'build',
   bundledWebRuntime: false,

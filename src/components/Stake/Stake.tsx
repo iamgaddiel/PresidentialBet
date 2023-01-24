@@ -1,4 +1,4 @@
-import { IonInput, IonButton } from '@ionic/react'
+import { IonInput, IonButton, IonAlert } from '@ionic/react'
 import React, { useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
 import '../../screens/Login/Login.css'
@@ -7,15 +7,10 @@ import useSettings from '../../hooks/useSetting'
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 import useStorage from '../../hooks/useStorage'
 import { STAKE_DATA } from '../../keys'
+import { StakeDataType } from '../../@types/collections'
 
 
 
-type StakeDataType = {
-    stake: number
-    candidate: string
-    payout: number
-    user: string
-}
 
 
 type PropType = {
@@ -38,8 +33,10 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     const { storeItem } = useStorage()
     const [hasStaked, setHasStaked] = useState(false)
     const [loading, setLoading] = useState(false)
-    
-    
+    const [toastMessage, setToastMessage] = useState("")
+    const [showToast, setShowToast] = useState(false)
+
+
 
 
 
@@ -83,26 +80,23 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
             user: user?.id!
         }
 
-        // flutterwave
-        handleFlutterPayment({
-            callback: (response) => {
-                storeItem(STAKE_DATA, data)
-                setHasStaked(true)
-                setLoading(false)
-                closeModalFallback()
-                closePaymentModal() // this will close the modal programmatically
-            },
-            onClose: () => {
-                setLoading(false)
-                closeModalFallback()
-            }
-        })
+        // if (data === null) {
+        //     console.log("Staking data empty")
+        //     setToastMessage("No stake found")
+        //     setShowToast(true)
+        //     return;
+        // }
 
-        if (!hasStaked) {
+        if (user?.wallet_balance < 100 || user?.wallet_balance < data?.stake) {
             setLoading(false)
-            closeModalFallback()
-            setHasStaked(false)
+            console.log("Inssuficient wallet balance")
+            setToastMessage("Inssuficient wallet balance")
+            setShowToast(true)
+            return;
         }
+
+        // storeItem(STAKE_DATA, data)
+        // closeModalFallback()
     }
 
 
@@ -125,6 +119,13 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
                     />
                 ) : null
             }
+            <IonAlert
+                isOpen={showToast}
+                message={toastMessage}
+                onDidDismiss={() => {
+                    closeModalFallback()
+                    setShowToast(false)
+                }} />
             <form className="ion-padding">
 
                 {/* Candidate */}

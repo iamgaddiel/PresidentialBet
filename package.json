@@ -29,6 +29,7 @@
     "@types/react-router-dom": "^5.1.7",
     "bootstrap": "5.2.3",
     "chartjs": "^0.3.24",
+    "cordova-plugin-ionic": "5.5.3",
     "cordova-res": "^0.15.4",
     "cordova-sqlite-storage": "^6.1.0",
     "dotenv": "^16.0.3",

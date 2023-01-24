@@ -10,3 +10,11 @@ export type StakeCollectionType = {
   stake: number;
   odd: number;
 };
+
+export type StakeDataType = {
+  stake: number
+  candidate: string
+  payout: number
+  user: string
+}
+
