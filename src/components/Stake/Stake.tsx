@@ -6,8 +6,10 @@ import Loader from '../Loader'
 import useSettings from '../../hooks/useSetting'
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 import useStorage from '../../hooks/useStorage'
-import { STAKE_DATA } from '../../keys'
+import { STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION } from '../../keys'
 import { StakeDataType } from '../../@types/collections'
+import useAuth from '../../hooks/useAuth'
+import useCollection from '../../hooks/useCollection'
 
 
 
@@ -25,6 +27,8 @@ type PropType = {
 const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     const [subscribedCandidateDetail, setSubscribedCandidateDetail] = useState<CandidateType>(candidate)
     const { FLUTTERWAVE_PK_KEY } = useSettings()
+    const { storeUser } = useAuth()
+    const { updateCollection, addToCollection } = useCollection()
 
 
     const [payout, setPayout] = useState<number>(0)
@@ -39,33 +43,7 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
 
 
 
-
-    const flutterConfig = {
-        public_key: FLUTTERWAVE_PK_KEY,
-        tx_ref: `pg-${Date.now()}`,
-        amount: stake,
-        currency: 'NGN',
-        payment_options: 'card',
-        customer: {
-            email: user?.email!,
-            phone_number: user?.phone!,
-            name: `${user?.firstName!} ${user?.lastName!}`,
-        },
-        customizations: {
-            title: 'PresidentialGame Staking Payment',
-            description: 'Stake for favorite candidate',
-
-            // TODO link logo server
-            logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
-        },
-    };
-
-    const handleFlutterPayment = useFlutterwave(flutterConfig);
-
-
-
-
-    const handleFormSubmission = async () => {
+    async function handleFormSubmission() {
         if (stake < 100) {
             setShowError(true)
             return
@@ -74,33 +52,40 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
         setLoading(true)
 
         const data: StakeDataType = {
-            payout,
+            payout: String(payout),
             candidate: candidate?.id!,
             stake,
-            user: user?.id!
+            user: user?.id!,
+            odd: candidate?.odds!
         }
+        console.log("🚀 ~ file: Stake.tsx:55 ~ handleFormSubmission ~ data", data)
 
-        // if (data === null) {
-        //     console.log("Staking data empty")
-        //     setToastMessage("No stake found")
-        //     setShowToast(true)
-        //     return;
-        // }
-
-        if (user?.wallet_balance < 100 || user?.wallet_balance < data?.stake) {
+        if (user?.wallet_balance < data?.stake) {
             setLoading(false)
-            console.log("Inssuficient wallet balance")
             setToastMessage("Inssuficient wallet balance")
             setShowToast(true)
             return;
         }
 
-        // storeItem(STAKE_DATA, data)
-        // closeModalFallback()
+
+        // updaate local storagae wallet address
+        let newWalletBalance = user.wallet_balance - data.stake
+
+        // update user's wallet balance locally 
+        storeUser({ ...user, wallet_balance: newWalletBalance })
+
+        // set stake data to memory
+        storeItem(STAKE_DATA, data)
+
+        // update user's remote wallet balance
+        updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
+
+        setLoading(false)
+        closeModalFallback()
     }
 
 
-
+    // 
     const calculatePayout = (currentStake: number = 100) => {
         currentStake = (!isNaN(currentStake)) ? currentStake : 0
         setStake(currentStake)

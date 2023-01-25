@@ -24,7 +24,7 @@ type PropType = {
     showStakeModal: boolean
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>
     image: string
-    getStoredUser: () => Promise<any>
+    getUserDetail: () => Promise<void>
 }
 
 const CandidateDetailModal: React.FC<PropType> = ({
@@ -37,6 +37,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
     showStakeModal,
     setShowModal,
     image,
+    getUserDetail
 }) => {
 
     const { pb, storeUser, getStoredUser } = useAuth()
@@ -60,26 +61,32 @@ const CandidateDetailModal: React.FC<PropType> = ({
     }
 
     const closeModel = async () => {
-        pb.collection(CANDIDATES_COLLECTION).unsubscribe()
         setModalIsOpen(false)
         setShowModal(false)
 
         const paymentData = await getItem(STAKE_DATA) as StakeDataType
-        console.log("🚀 ~ file: CandidateDetailModal.tsx:68 ~ closeModel ~ paymentData", paymentData)
+
+        if (paymentData !== null) {
+
+            //  create stake daa
+            addToCollection(STAKES_COLLECTION, paymentData)
+
+            //  update user properties
+            if (!user?.hasSelected) {
+                const updatedUserDeatail = await updateCollection(USERS_COLLECTION, user?.id, {
+                    hasSelected: true,
+                    selected_candidate: candidate.id
+                }) as UserCollectionType
+
+                storeUser({ ...user, hasSelected: true, selected_candidate: candidate.id })
+                setUser(updatedUserDeatail) //update stake button
+            }
+        }
 
 
-        //  create stake daa
-        addToCollection(STAKES_COLLECTION, paymentData)
+        getUserDetail()
 
-        //  update user properties
-        const updatedUserDeatail = await updateCollection(USERS_COLLECTION, user?.id, {
-            hasSelected: true,
-            selected_candidate: candidate.id
-        }) as UserCollectionType
-        storeUser(updatedUserDeatail)
-        setUser(updatedUserDeatail)
-
-        // reset payment data
+        // reset payment data on memory
         clearItems()
     }
 

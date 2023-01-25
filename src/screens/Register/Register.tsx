@@ -217,11 +217,12 @@ const Register = () => {
                                 <small className="ion-text-center">
                                     <IonText>
                                         if you continue, you agree to our
-                                        <IonRouterLink routerDirection="forward" href="/forgot-password" style={{ textAlign: 'center' }} className='ion-margin-horizontal'>
+                                        <IonRouterLink routerDirection="forward" href="" style={{ textAlign: 'center' }} className='ion-margin-horizontal'>
                                             Terms & Condition
                                         </IonRouterLink>
                                         and
-                                        <IonRouterLink routerDirection="forward" href="/forgot-password" style={{ textAlign: 'center' }} className='ion-margin-horizontal'>
+                                        <IonRouterLink routerDirection="forward" href="https://www.privacypolicies.com/live/a0f7982b-a79e-423b-a067-fce5dfafe872
+" style={{ textAlign: 'center' }} className='ion-margin-horizontal'>
                                             Privacy Policy
                                         </IonRouterLink>
                                     </IonText>

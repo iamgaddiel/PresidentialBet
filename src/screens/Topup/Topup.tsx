@@ -58,8 +58,23 @@ const Topup = () => {
 
     const handleFlutterPayment = useFlutterwave(flutterConfig);
 
+    async function getAuthUser() {
+        const user = await getStoredUser()
+        setAuthUser(user)
+    }
 
-    function handleTopup() {
+
+    async function updateUserDetail(user: UserCollectionType) {
+        // update user details locally
+        let newBalance = user?.wallet_balance + topupAmount
+        await storeUser({ ...user, wallet_balance: newBalance })
+
+        // update user detail remotely
+        await updateCollection(USERS_COLLECTION, user?.id!, {wallet_balance: newBalance})
+    }
+
+    function handleTopup(user: UserCollectionType) {
+        console.log("🚀 ~ file: Topup.tsx:77 ~ handleTopup ~ user", user)
         if (topupAmount < 100) return;
 
         setLoading(true)
@@ -68,7 +83,7 @@ const Topup = () => {
         handleFlutterPayment({
             callback: (response) => {
                 setLoading(false)
-                updateUserDetail()
+                updateUserDetail(user)
                 history.push('/dashboard')
                 closePaymentModal() // this will close the modal programmatically
             },
@@ -78,19 +93,8 @@ const Topup = () => {
         })
     }
 
-    async function updateUserDetail() {
-        // update user details locally
-        let newBalance = authUser?.wallet_balance! + topupAmount
-        await storeUser({ ...authUser, wallet_balance: newBalance })
 
-        // update user detail remotely
-        await updateCollection(USERS_COLLECTION, authUser?.id!, {wallet_balance: newBalance})
-    }
 
-    async function getAuthUser() {
-        const res = await getStoredUser()
-        setAuthUser(res)
-    }
 
 
     return (
@@ -132,7 +136,7 @@ const Topup = () => {
                         expand='block'
                         className='text-light text-capitalize fill text-dark'
                         size='large'
-                        onClick={() => handleTopup()}
+                        onClick={() => handleTopup(authUser!)}
                     >
                         <IonIcon icon={cardSharp} color={"dark"} slot="end" />
                         Top up

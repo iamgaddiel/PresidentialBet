@@ -14,7 +14,8 @@ export type StakeCollectionType = {
 export type StakeDataType = {
   stake: number
   candidate: string
-  payout: number
+  payout: string
   user: string
+  odd: number
 }
 

@@ -1,4 +1,4 @@
-import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonItemDivider, IonList, IonListHeader, IonPage, IonRefresher, IonRefresherContent, IonRouterLink, IonSkeletonText, IonText, IonToast, RefresherEventDetail, useIonAlert } from '@ionic/react'
+import { IonAvatar, IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonIcon, IonImg, IonItem, IonList, IonListHeader, IonPage, IonRefresher, IonRefresherContent, IonRouterLink, IonSkeletonText, IonText, RefresherEventDetail, useIonAlert } from '@ionic/react'
 import { card, caretForward, dice, timeOutline, wallet } from 'ionicons/icons'
 import { useContext, useEffect, useState } from 'react'
 import { CandidateType, UserCollectionType } from '../../@types/user'
@@ -6,7 +6,7 @@ import Header from '../../components/Header'
 import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
-import { CANDIDATES_COLLECTION, STAKES_COLLECTION, STAKE_DATA } from '../../keys'
+import { CANDIDATES_COLLECTION } from '../../keys'
 import PlaceholderImage from '../../assets/images/card-media.png'
 
 import './Dashboard.css'
@@ -21,9 +21,7 @@ import Coin from '../../assets/svg/blockchain.svg'
 import { useQuery } from 'react-query'
 import { CollectionContext, CollectionContextType } from '../../context/CollectionProvider'
 import { StakeCollectionType } from '../../@types/collections'
-import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 import useStorage from '../../hooks/useStorage'
-import Loader from '../../components/Loader'
 
 
 type CalculatedStakeType = {
@@ -54,36 +52,33 @@ const Dashboard = () => {
   const { UserStakes, getUserStakes } = useContext(CollectionContext) as CollectionContextType
   const { getSingleCollection } = useCollection()
 
-  const { storeItem } = useStorage()
-  const [displayTopupAlert] = useIonAlert()
-
 
 
 
   useEffect(() => {
     setShowTabs(true);
-    handleRefresh()
     getUser()
     getAllCandidates()
-    
-    getSelectedCandidateOdd()
-    calculateSumOfUserStakes()
-    
   }, [])
 
 
 
 
-
-
-  async function getAllUserStakes() {
-    setStakes(await getUserStakes(authUser?.id!))
-  }
-
   async function getUser() {
-    const res = await getStoredUser()
-    setAuthUser(res)
+    const user = await getStoredUser() as UserCollectionType
+
+    getAllUserStakes(user.id)
+    getSelectedCandidateOdd(user)
+    setAuthUser(user)
   }
+
+
+  async function getAllUserStakes(userId: string) {
+    const userStakes = await getUserStakes(userId)
+    calculateSumOfUserStakes(userStakes)
+    // setStakes(userStakes)
+  }
+
 
   async function getAllCandidates() {
     const response = getCollectionList(CANDIDATES_COLLECTION)
@@ -93,6 +88,7 @@ const Dashboard = () => {
       })
     return response
   }
+
 
   function getCandidateDetail(candidateId: string) {
     let res = data?.find((person: CandidateType) => person.id === candidateId)
@@ -107,34 +103,29 @@ const Dashboard = () => {
 
 
   // todo: move to util
-  function calculateSum(item: StakeCollectionType) {
+  function calculateSum(stake: number) {
     let sum = 0;
-    sum += item.stake
+    sum += stake
     return sum
   }
 
-  async function calculateSumOfUserStakes() {
-    // Calculated sum of all user stakes
-    const stakeSum: number = UserStakes.data?.map((item: StakeCollectionType) => calculateSum(item))
-    .reduce((x: number, y: number) => x + y, 0)
+  // Calculated sum of all user stakes
+  async function calculateSumOfUserStakes(userStakes: StakeCollectionType[]) {
+    const stakeSum: number = userStakes?.map(({ stake }) => calculateSum(stake)).reduce((x: number, y: number) => x + y, 0)
     setSumStake(stakeSum)
     // getSelectedCandidateOdd()
   }
 
-  async function getSelectedCandidateOdd() {
-    if (authUser?.hasSelected) {
-      const selectedCandidate = await getSingleCollection(CANDIDATES_COLLECTION, authUser?.selected_candidate) as CandidateType
-      console.log("🚀 ~ file: Dashboard.tsx:124 ~ getSelectedCandidateOdd ~ selectedCandidate", selectedCandidate)
+  async function getSelectedCandidateOdd({ selected_candidate }: UserCollectionType) {
+    if (selected_candidate) {
+      const selectedCandidate = await getSingleCollection(CANDIDATES_COLLECTION, selected_candidate) as CandidateType
       setSelectedCandidateOdd(selectedCandidate?.odds!)
     }
   }
 
   // 
-  function handleRefresh(event?: CustomEvent<RefresherEventDetail>) {
+  function handleRefresh(event?: CustomEvent<RefresherEventDetail> | any) {
     setTimeout(() => {
-      getSelectedCandidateOdd()
-      getAllUserStakes()
-      calculateSumOfUserStakes()
       getUser()
       event?.detail.complete();
     }, 2500);
@@ -187,26 +178,26 @@ const Dashboard = () => {
                   <div className='mt-2'>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Total Stake</span>
-                      <IonSkeletonText animated style={{ width: "50px"}} />
+                      <h3 className='h3'>₦ 0</h3>
                     </div>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Total Payout</span>
-                      <IonSkeletonText animated style={{ width: "50px"}} />
+                      <h3 className='h3'>₦ 0</h3>
                     </div>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Odds</span>
-                      <IonSkeletonText animated style={{ width: "50px"}} />
+                      <h3 className='h3'>₦ 0</h3>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Total Stake</span>
-                      <h3 className='h3'>₦{stakeSum}</h3>
+                      <h3 className='h3'>₦ {stakeSum}</h3>
                     </div>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Total Payout</span>
-                      <h3 className='h3'>₦{stakeSum * selectedCandidateOdd} </h3>
+                      <h3 className='h3'>₦ {stakeSum * selectedCandidateOdd} </h3>
                     </div>
                     <div className="d-flex justify-content-between align-item-center fw-bold">
                       <span>Odds</span>
@@ -302,7 +293,7 @@ const Dashboard = () => {
             showStakeModal={showStakeModal}
             setShowModal={setShowModal}
             image={getImage(CANDIDATES_COLLECTION, candidateDetail?.id!, candidateDetail?.image!)}
-            getStoredUser={getUser}
+            getUserDetail={getUser}
           />
 
         </section>
