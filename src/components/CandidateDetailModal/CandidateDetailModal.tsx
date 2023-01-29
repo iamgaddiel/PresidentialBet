@@ -41,10 +41,8 @@ const CandidateDetailModal: React.FC<PropType> = ({
     getUserDetail
 }) => {
 
-    const { pb, storeUser, getStoredUser, clearStoredUser } = useAuth()
+    const { pb, storeUser, clearStoredUser } = useAuth()
     const { getItem, clearItems } = useStorage()
-    const { DEBUG } = useSettings()
-
     const { addToCollection, updateCollection } = useCollection()
 
 
@@ -75,15 +73,16 @@ const CandidateDetailModal: React.FC<PropType> = ({
             
             addToCollection(STAKES_COLLECTION, paymentData)
 
-
             storeUser({ ...user, wallet_balance: newWalletBalance })
-            updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
 
-            getUserDetail()
+            updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
 
             // reset payment data on memory
             clearItems()
+
         }
+        
+        getUserDetail()
 
     }
 
@@ -95,7 +94,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
             <IonModal
                 isOpen={modalIsOpen}
                 initialBreakpoint={0.25}
-                breakpoints={[0, 0.5, 0.75]}
+                breakpoints={[0, 0.75, 0.90]}
                 onDidDismiss={() => closeModel()}>
 
                 <IonContent className="" style={{ position: 'relative' }}>
@@ -144,7 +143,6 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                             ) : null
                                         }
                                     </div>
-
 
                                 </section>
 

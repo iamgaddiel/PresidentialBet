@@ -68,10 +68,10 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
 
         // set stake data and wallet balance to memory
         storeItem(STAKE_DATA, data)
-        storeItem(WALLET_BALANCE, { wallet_balance: newWalletBalance })
+        storeItem(WALLET_BALANCE,  newWalletBalance )
 
         // update user's remote wallet balance
-        // updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
+        updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
 
         setLoading(false)
         closeModalFallback()

@@ -63,29 +63,33 @@ const Topup = () => {
     }
 
 
-    async function updateUserDetail(user: UserCollectionType) {
-        // update user details locally
-        let newBalance = user?.wallet_balance + topupAmount
-        console.log("🚀 ~ file: Topup.tsx:69 ~ updateUserDetail ~ newBalance", newBalance)
-        await storeUser({ ...user, wallet_balance: newBalance })
+    // async function updateUserDetail(user: UserCollectionType) {
+    //     // update user details locally
+    //     let newBalance = user?.wallet_balance + topupAmount
+    //     await storeUser({ ...user, wallet_balance: newBalance })
 
-        // update user detail remotely
-        await updateCollection(USERS_COLLECTION, user?.id!, { wallet_balance: newBalance })
-    }
+    //     // update user detail remotely
+    //     await updateCollection(USERS_COLLECTION, user?.id!, { wallet_balance: newBalance })
+    // }
 
 
-    function handleTopup(user: UserCollectionType) {
+    async function handleTopup(user: UserCollectionType) {
+
         if (topupAmount < 100) return;
 
         setLoading(true)
 
+        let newBalance = user?.wallet_balance + topupAmount
+
         // flutterwave
         handleFlutterPayment({
             callback: (response) => {
+                // updateUserDetail(user)
+                storeUser({ ...user, wallet_balance: newBalance })
+                updateCollection(USERS_COLLECTION, user?.id!, { wallet_balance: newBalance })
                 setLoading(false)
-                updateUserDetail(user)
-                history.push('/dashboard')
                 closePaymentModal() // this will close the modal programmatically
+                history.push('/dashboard')
             },
             onClose: () => {
                 setLoading(false)
