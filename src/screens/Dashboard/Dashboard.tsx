@@ -10,7 +10,6 @@ import { CANDIDATES_COLLECTION } from '../../keys'
 import PlaceholderImage from '../../assets/images/card-media.png'
 
 import './Dashboard.css'
-import useSettings from '../../hooks/useSetting'
 import CandidateDetailModal from '../../components/CandidateDetailModal'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, A11y, Pagination, Scrollbar } from 'swiper'
@@ -21,28 +20,18 @@ import Coin from '../../assets/svg/blockchain.svg'
 import { useQuery } from 'react-query'
 import { CollectionContext, CollectionContextType } from '../../context/CollectionProvider'
 import { StakeCollectionType } from '../../@types/collections'
-import useStorage from '../../hooks/useStorage'
 
 
-type CalculatedStakeType = {
-  totalStake: number;
-  totalPayout: number;
-  odds: number
-}
 
 const Dashboard = () => {
   const { setShowTabs } = useContext(UtilContext) as UtilContextValues
-  const { getStoredUser, pb } = useAuth()
+  const { getStoredUser } = useAuth()
   const [authUser, setAuthUser] = useState<UserCollectionType>()
-  const { getCollectionList, getFilteredCollection, filterCollectionByUser } = useCollection()
-  const { DEBUG } = useSettings()
+  const { getCollectionList } = useCollection()
 
-  // const [candidates, setCandidates] = useState<CandidateType[]>([])
   const [candidateDetail, setCandidateDetail] = useState<CandidateType>()
-  const { getImage } = useContext(UtilContext) as UtilContextValues
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [showStakeModal, setShowModal] = useState(false)
-  const [stakes, setStakes] = useState<StakeCollectionType[]>([])
   const [stakeSum, setSumStake] = useState(0)
   const [selectedCandidateOdd, setSelectedCandidateOdd] = useState(0)
 
@@ -51,6 +40,7 @@ const Dashboard = () => {
   const { data, isLoading } = useQuery(CANDIDATES_COLLECTION, getAllCandidates)
   const { UserStakes, getUserStakes } = useContext(CollectionContext) as CollectionContextType
   const { getSingleCollection } = useCollection()
+  const { getCandidateImage } = useContext(UtilContext) as UtilContextValues
 
 
 
@@ -102,7 +92,6 @@ const Dashboard = () => {
   }
 
 
-  // todo: move to util
   function calculateSum(stake: number) {
     let sum = 0;
     sum += stake
@@ -116,6 +105,7 @@ const Dashboard = () => {
     // getSelectedCandidateOdd()
   }
 
+
   async function getSelectedCandidateOdd({ selected_candidate }: UserCollectionType) {
     if (selected_candidate) {
       const selectedCandidate = await getSingleCollection(CANDIDATES_COLLECTION, selected_candidate) as CandidateType
@@ -123,7 +113,7 @@ const Dashboard = () => {
     }
   }
 
-  // 
+
   function handleRefresh(event?: CustomEvent<RefresherEventDetail> | any) {
     setTimeout(() => {
       getUser()
@@ -246,7 +236,7 @@ const Dashboard = () => {
                         <div className="text-center mb-3 card db py-2 px-1" key={id} onClick={() => getCandidateDetail(id)}>
 
                           <IonAvatar className='mx-auto'>
-                            <IonImg src={getImage(CANDIDATES_COLLECTION, id, image)} alt={fullname} />
+                            <IonImg src={getCandidateImage(fullname)} alt={fullname} />
                           </IonAvatar>
 
                           <div className='mt-2'>
@@ -292,7 +282,7 @@ const Dashboard = () => {
             user={authUser!}
             showStakeModal={showStakeModal}
             setShowModal={setShowModal}
-            image={getImage(CANDIDATES_COLLECTION, candidateDetail?.id!, candidateDetail?.image!)}
+            image={getCandidateImage(candidateDetail?.fullname!)}
             getUserDetail={getUser}
           />
 

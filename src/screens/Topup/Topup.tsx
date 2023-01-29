@@ -20,7 +20,6 @@ const Topup = () => {
     const [loading, setLoading] = useState(false)
 
 
-    const { storeItem } = useStorage()
     const { storeUser } = useAuth()
     const { getStoredUser } = useAuth()
     const { FLUTTERWAVE_PK_KEY } = useSettings()
@@ -67,14 +66,15 @@ const Topup = () => {
     async function updateUserDetail(user: UserCollectionType) {
         // update user details locally
         let newBalance = user?.wallet_balance + topupAmount
+        console.log("🚀 ~ file: Topup.tsx:69 ~ updateUserDetail ~ newBalance", newBalance)
         await storeUser({ ...user, wallet_balance: newBalance })
 
         // update user detail remotely
-        await updateCollection(USERS_COLLECTION, user?.id!, {wallet_balance: newBalance})
+        await updateCollection(USERS_COLLECTION, user?.id!, { wallet_balance: newBalance })
     }
 
+
     function handleTopup(user: UserCollectionType) {
-        console.log("🚀 ~ file: Topup.tsx:77 ~ handleTopup ~ user", user)
         if (topupAmount < 100) return;
 
         setLoading(true)
@@ -101,7 +101,7 @@ const Topup = () => {
         <IonPage>
             <BackHeader title='Topup' />
             <IonContent className="ion-padding" fullscreen>
-                <Loader isOpen={loading} message={"Toping up...."} fallback={() => setLoading(false)} />
+                <Loader isOpen={loading} message={"Processing...."} fallback={() => setLoading(false)} />
 
                 <IonToast
                     position='top'

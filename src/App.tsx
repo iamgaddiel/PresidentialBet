@@ -9,11 +9,10 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-  IonToast,
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { barChartOutline, homeOutline, people, personCircleOutline, pieChartOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
+import { homeOutline, personCircleOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';

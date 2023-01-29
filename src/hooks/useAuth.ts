@@ -68,6 +68,11 @@ const useAuth = () => {
     await storage.set(USER, user);
   };
 
+  async function clearStoredUser () {
+    console.log("clearing")
+    storage.remove(USER)
+  }
+
 
   const getStoredUser = async () => {
     try {
@@ -137,7 +142,8 @@ const useAuth = () => {
     verifyBvn,
     verifyUserAccount,
     resetPassword,
-    deleteStoredUser
+    deleteStoredUser,
+    clearStoredUser
   };
 };
 

@@ -1,6 +1,12 @@
 import React, { createContext, SetStateAction, useState } from 'react'
 import useSettings from '../hooks/useSetting';
 
+import Atiku from '../assets/images/Atiku.jpg'
+import Obi from '../assets/images/Obi.jpg'
+import Tinubu from '../assets/images/Tinubu.jpg'
+import Rabiu from '../assets/images/Rabiu.jpg'
+import Sowore from '../assets/images/Sowore.jpg'
+
 
 export type PaymentDataType = {
     payout: number
@@ -16,6 +22,7 @@ export type UtilContextValues = {
     getImage: (collectionId: string, recordId: string, filename: string) => string;
     paymentData: PaymentDataType | undefined
     setPaymentData: React.Dispatch<SetStateAction<PaymentDataType | undefined>>
+    getCandidateImage: (candidateName: string) => string | undefined
 }
 
 export const UtilContext = createContext<UtilContextValues | null>(null);
@@ -42,6 +49,26 @@ const UtilProvider = ({ children }: any) => {
     }
 
 
+    function getCandidateImage(candidateName: string) {
+        switch (candidateName) {
+            case "Atiku Abubakar":
+                return Atiku
+
+            case "Asiwaju Bola Tinubu":
+                return Tinubu
+
+            case "Peter Obi":
+                return Obi
+
+            case "Rabi'u Musa Kwankwaso":
+                return Rabiu
+
+            case "Omoyele Sowore":
+                return Sowore
+        }
+    }
+
+
     return (
         <UtilContext.Provider value={{
             showTabs,
@@ -49,7 +76,8 @@ const UtilProvider = ({ children }: any) => {
             getImage,
             getImageThumbnail,
             paymentData,
-            setPaymentData
+            setPaymentData,
+            getCandidateImage
         }}>
             {children}
         </UtilContext.Provider>

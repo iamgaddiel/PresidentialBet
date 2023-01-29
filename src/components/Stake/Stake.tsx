@@ -6,7 +6,7 @@ import Loader from '../Loader'
 import useSettings from '../../hooks/useSetting'
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3'
 import useStorage from '../../hooks/useStorage'
-import { STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION } from '../../keys'
+import { STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION, WALLET_BALANCE } from '../../keys'
 import { StakeDataType } from '../../@types/collections'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
@@ -26,16 +26,14 @@ type PropType = {
 
 const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
     const [subscribedCandidateDetail, setSubscribedCandidateDetail] = useState<CandidateType>(candidate)
-    const { FLUTTERWAVE_PK_KEY } = useSettings()
-    const { storeUser } = useAuth()
-    const { updateCollection, addToCollection } = useCollection()
+    const { storeUser, clearStoredUser } = useAuth()
+    const { updateCollection } = useCollection()
 
 
     const [payout, setPayout] = useState<number>(0)
     const [stake, setStake] = useState(0)
     const [showError, setShowError] = useState(false)
     const { storeItem } = useStorage()
-    const [hasStaked, setHasStaked] = useState(false)
     const [loading, setLoading] = useState(false)
     const [toastMessage, setToastMessage] = useState("")
     const [showToast, setShowToast] = useState(false)
@@ -58,7 +56,6 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
             user: user?.id!,
             odd: candidate?.odds!
         }
-        console.log("🚀 ~ file: Stake.tsx:55 ~ handleFormSubmission ~ data", data)
 
         if (user?.wallet_balance < data?.stake) {
             setLoading(false)
@@ -67,18 +64,14 @@ const Stake: React.FC<PropType> = ({ candidate, user, closeModalFallback }) => {
             return;
         }
 
-
-        // updaate local storagae wallet address
         let newWalletBalance = user.wallet_balance - data.stake
 
-        // update user's wallet balance locally 
-        storeUser({ ...user, wallet_balance: newWalletBalance })
-
-        // set stake data to memory
+        // set stake data and wallet balance to memory
         storeItem(STAKE_DATA, data)
+        storeItem(WALLET_BALANCE, { wallet_balance: newWalletBalance })
 
         // update user's remote wallet balance
-        updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
+        // updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
 
         setLoading(false)
         closeModalFallback()

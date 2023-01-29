@@ -3,11 +3,12 @@ import { alert, thumbsUp } from 'ionicons/icons'
 import React, { useContext, useEffect, useState } from 'react'
 import { StakeDataType } from '../../@types/collections'
 import { CandidateType, UserCollectionType } from '../../@types/user'
+import { UtilContext, UtilContextValues } from '../../context/utilContext'
 import useAuth from '../../hooks/useAuth'
 import useCollection from '../../hooks/useCollection'
 import useSettings from '../../hooks/useSetting'
 import useStorage from '../../hooks/useStorage'
-import { CANDIDATES_COLLECTION, STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION } from '../../keys'
+import { CANDIDATES_COLLECTION, STAKES_COLLECTION, STAKE_DATA, USERS_COLLECTION, WALLET_BALANCE } from '../../keys'
 import Stake from '../Stake'
 
 import "./CandidateDetailModal.css"
@@ -23,7 +24,7 @@ type PropType = {
     setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>
     showStakeModal: boolean
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>
-    image: string
+    image: string | undefined
     getUserDetail: () => Promise<void>
 }
 
@@ -40,54 +41,50 @@ const CandidateDetailModal: React.FC<PropType> = ({
     getUserDetail
 }) => {
 
-    const { pb, storeUser, getStoredUser } = useAuth()
+    const { pb, storeUser, getStoredUser, clearStoredUser } = useAuth()
     const { getItem, clearItems } = useStorage()
     const { DEBUG } = useSettings()
 
     const { addToCollection, updateCollection } = useCollection()
-    const [_user, setUser] = useState<UserCollectionType>(user)
 
 
-
-    useEffect(() => {
-        getCurrentUserDetail()
-    }, [])
-
-
-
-    async function getCurrentUserDetail() {
-        const res = await getStoredUser()
-        setUser(res)
-    }
 
     const closeModel = async () => {
         setModalIsOpen(false)
         setShowModal(false)
 
         const paymentData = await getItem(STAKE_DATA) as StakeDataType
+        const newWalletBalance: number = await getItem(WALLET_BALANCE)
 
         if (paymentData !== null) {
 
-            //  create stake daa
-            addToCollection(STAKES_COLLECTION, paymentData)
-
             //  update user properties
-            if (!user?.hasSelected) {
-                const updatedUserDeatail = await updateCollection(USERS_COLLECTION, user?.id, {
+            if (!user.hasSelected) {
+                updateCollection(USERS_COLLECTION, user?.id, {
                     hasSelected: true,
                     selected_candidate: candidate.id
-                }) as UserCollectionType
-
-                storeUser({ ...user, hasSelected: true, selected_candidate: candidate.id })
-                setUser(updatedUserDeatail) //update stake button
+                })
+                storeUser({
+                    ...user,
+                    hasSelected: true,
+                    selected_candidate: candidate.id
+                })
             }
+            
+            clearStoredUser()
+            
+            addToCollection(STAKES_COLLECTION, paymentData)
+
+
+            storeUser({ ...user, wallet_balance: newWalletBalance })
+            updateCollection(USERS_COLLECTION, user.id, { wallet_balance: newWalletBalance })
+
+            getUserDetail()
+
+            // reset payment data on memory
+            clearItems()
         }
 
-
-        getUserDetail()
-
-        // reset payment data on memory
-        clearItems()
     }
 
 
@@ -98,7 +95,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
             <IonModal
                 isOpen={modalIsOpen}
                 initialBreakpoint={0.25}
-                breakpoints={[0, 0.25, 0.5, 0.75]}
+                breakpoints={[0, 0.5, 0.75]}
                 onDidDismiss={() => closeModel()}>
 
                 <IonContent className="" style={{ position: 'relative' }}>
@@ -114,6 +111,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                             </IonAvatar>
                                         </div>
                                     </section>
+
                                     <div className="text-center my-3">
                                         <span className="mt-5">{candidate?.fullname} </span>
                                     </div>
@@ -122,7 +120,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
 
                                     <div className='d-flex justify-content-center'>
                                         {
-                                            _user?.hasSelected && candidate?.id === _user?.selected_candidate ? (
+                                            user?.hasSelected && candidate?.id === user?.selected_candidate ? (
                                                 <IonButton
                                                     className='fill'
                                                     shape='round'
@@ -134,7 +132,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
                                             ) : null
                                         }
                                         {
-                                            !_user?.hasSelected ? (
+                                            !user?.hasSelected ? (
                                                 <IonButton
                                                     className='fill'
                                                     shape='round'
@@ -152,7 +150,7 @@ const CandidateDetailModal: React.FC<PropType> = ({
 
                             ) : (
                                 <Stake
-                                    user={_user}
+                                    user={user}
                                     candidate={candidate}
                                     closeModalFallback={closeModel}
                                 // loading={loading}
