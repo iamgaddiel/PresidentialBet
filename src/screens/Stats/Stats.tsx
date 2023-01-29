@@ -23,7 +23,7 @@ type CandidateStatsType = {
 const Stats = () => {
     const { DEBUG } = useSettings()
     const { getCollectionList } = useCollection()
-    const { getImage } = useContext(UtilContext) as UtilContextValues
+    const { getImage, getCandidateImage } = useContext(UtilContext) as UtilContextValues
 
     const omoyeleId = DEBUG ? "4bhnf50221rhr3f" : "gwwaqmi4bc6t4lt"
     const kwankwasoId = DEBUG ? "ge8jxtp4whpficw" : "2uumoulo8q73v7s"
@@ -151,7 +151,7 @@ const Stats = () => {
                                         </div>
                                         <IonAvatar>
                                             <IonImg
-                                                src={getImage(CANDIDATES_COLLECTION, candidate?.id, candidate?.image)}
+                                                src={getCandidateImage(candidate?.fullname!)}
                                                 alt={"candidates"}
                                             />
                                         </IonAvatar>
