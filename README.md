@@ -1,4 +1,4 @@
-# Presidential Bet
+# Presidential Game
 
 ## Description
 A mobile betting app made specifically for upcoming 2023 Nigerian presidential election. People who made a bet on their favorite candidate and won will receive a payout for all their stakes.

@@ -1,5 +1,5 @@
 import { Network } from '@capacitor/network';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useHistory } from 'react-router-dom';
 import {
   IonAlert,
   IonApp,
@@ -34,7 +34,7 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import './global.css'
 import LandingPage from './screens/LandingPage/LandingPage';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Login from './screens/Login/Login';
 import Register from './screens/Register/Register';
 import { UtilContext, UtilContextValues } from './context/utilContext';
@@ -54,6 +54,7 @@ import ForgotPassword from './screens/ForgotPassword';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import CollectionProvider from './context/CollectionProvider';
 import Topup from './screens/Topup';
+import useAuth from './hooks/useAuth';
 
 
 setupIonicReact();
@@ -64,6 +65,7 @@ const App: React.FC = () => {
   const { showTabs } = useContext(UtilContext) as UtilContextValues
   const queryClient = new QueryClient()
   const [isOpen, setIsOpen] = useState(false)
+  const { getStoredUser } = useAuth()
 
 
   Network.addListener('networkStatusChange', status => {

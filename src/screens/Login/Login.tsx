@@ -13,6 +13,9 @@ import Logo from '../../assets/images/dice_.png'
 
 import './Login.css'
 import { UserCollectionType } from "../../@types/user";
+import Dashboard from "../Dashboard";
+import { storage } from "../../atom";
+import { USER } from "../../keys";
 
 type InputsType = {
     email: string,
@@ -20,12 +23,14 @@ type InputsType = {
 };
 
 
-const Login = () => {
+
+function Login() {
+    const { authenticateUser, pb, getUserFromDB, storeUser, getStoredUser } = useAuth()
+
     const [showPassword, setShowPassword] = useState(false)
     const passwordFiled = useRef<HTMLIonInputElement>(null)
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState("")
-    const { authenticateUser, pb, getUserFromDB, storeUser } = useAuth()
     const history = useHistory()
     const { setShowTabs } = useContext(UtilContext) as UtilContextValues
     const [showLoader, setShowLoader] = useState(false)
@@ -71,9 +76,9 @@ const Login = () => {
     }
 
 
-    useEffect(() => {
-        setShowTabs(false)
-    }, [])
+    // useEffect(() => {
+    //     setShowTabs(false)
+    // }, [])
 
 
     return (
@@ -181,7 +186,14 @@ const Login = () => {
             </IonContent>
         </IonPage>
     )
+
 }
 
-export default Login
 
+
+
+// function LoginPageContent() {
+
+// }
+
+export default Login

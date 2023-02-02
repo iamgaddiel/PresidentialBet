@@ -5,10 +5,12 @@ import { UserCollectionType } from "./@types/user";
 import { CANDIDATES_COLLECTION, CANDIDATE_DETAILS, SELECTED_CANDIDATE_ID, USERS_COLLECTION } from "./keys";
 
 
-export const storage = new Storage({
+const storage = new Storage({
   name: '__presidentialBet',
   driverOrder: [CordovaSQLiteDriver._driver, Drivers.IndexedDB, Drivers.LocalStorage]
 })
+
+storage.create()
 
 
 export type userAtomType = {
@@ -48,3 +50,8 @@ export const candidatesAtom = atom({
   key: CANDIDATES_COLLECTION,
   default: []
 })
+
+
+export {
+  storage
+}

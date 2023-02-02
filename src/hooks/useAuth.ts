@@ -28,9 +28,6 @@ const useAuth = () => {
   const pb = new Pocketbase(pbBaseUrl);
   const [authUser, setAuthUser] = useRecoilState(userAtom);
 
-  useEffect(() => {
-    storage.create();
-  }, []);
 
   const authenticateUser = async (email: string, password: string) => {
     try {

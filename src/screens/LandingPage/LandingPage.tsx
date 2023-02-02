@@ -25,6 +25,36 @@ import TeamImg from '../../assets/svg/undraw_team_re_0bfe.svg'
 import PieChartImg from '../../assets/images/pie-chart.png'
 import BarImg from '../../assets/images/bars.png'
 import CardImg from '../../assets/images/credit-cards-payment.png'
+import Dashboard from '../Dashboard';
+import { useState } from 'react';
+import { storage } from '../../atom';
+import { USER } from '../../keys';
+
+
+
+
+
+const LandingPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  (async function checkIfAuthenticated() {
+    storage.create()
+    const user = await storage.get(USER);
+    if (user !== null) setIsAuthenticated(true);
+    return;
+  })();
+
+  return (
+    <>
+      {
+        isAuthenticated ? <Dashboard /> : <LandingPageContent />
+      }
+    </>
+  )
+}
+
+
+
 
 
 
@@ -56,7 +86,7 @@ const slideContent = [
   },
 ]
 
-const LandingPage = () => {
+const LandingPageContent = () => {
   return (
     <IonPage>
       <IonContent className='ion-padding landing'>
@@ -91,7 +121,7 @@ const LandingPage = () => {
             routerLink='/register'
             expand='block'
             shape='round'
-            >
+          >
             Create Account
           </IonButton>
 
