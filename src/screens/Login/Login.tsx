@@ -76,11 +76,6 @@ function Login() {
     }
 
 
-    // useEffect(() => {
-    //     setShowTabs(false)
-    // }, [])
-
-
     return (
         <IonPage>
             <Loader isOpen={showLoader} message={"Loading...."} fallback={() => setShowLoader(false)} />

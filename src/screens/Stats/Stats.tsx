@@ -23,7 +23,7 @@ type CandidateStatsType = {
 const Stats = () => {
     const { DEBUG } = useSettings()
     const { getCollectionList } = useCollection()
-    const { getImage, getCandidateImage } = useContext(UtilContext) as UtilContextValues
+    const {  getCandidateImage } = useContext(UtilContext) as UtilContextValues
 
     const omoyeleId = DEBUG ? "4bhnf50221rhr3f" : "gwwaqmi4bc6t4lt"
     const kwankwasoId = DEBUG ? "ge8jxtp4whpficw" : "2uumoulo8q73v7s"
