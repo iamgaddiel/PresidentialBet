@@ -1,17 +1,18 @@
 import { IonAvatar, IonBadge, IonContent, IonIcon, IonItem, IonLabel, IonList, IonPage } from '@ionic/react'
 import { cardSharp, logOut, personSharp, walletSharp } from 'ionicons/icons'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import { UserCollectionType } from '../../@types/user'
 import Header from '../../components/Header'
 import useAuth from '../../hooks/useAuth'
+import { UtilContext, UtilContextValues } from '../../context/utilContext'
 
 
 const User = () => {
     const { logoutUser, getStoredUser, deleteStoredUser } = useAuth()
     const [user, setUser] = useState<UserCollectionType>()
     const history = useHistory()
-
+    const { setShowTabs } = useContext(UtilContext) as UtilContextValues
 
     const getUser = async () => {
         setUser(await getStoredUser())
@@ -20,6 +21,7 @@ const User = () => {
     const deAuthenticateUser = () => {
         logoutUser()
         deleteStoredUser()
+        setShowTabs(false)
         history.push("/login")
     }
 
@@ -41,7 +43,7 @@ const User = () => {
                                 ) : null
                             }
                         </IonAvatar>
-                        <small className='mt-3' style={{ fontSize: "25px"}}>{user?.firstName} {user?.lastName}</small> <br />
+                        <small className='mt-3' style={{ fontSize: "25px" }}>{user?.firstName} {user?.lastName}</small> <br />
                         <small className='mt-3'>{user?.email}</small>
                         <p className="mt-2">
                             <span>

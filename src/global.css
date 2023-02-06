@@ -63,3 +63,7 @@ ion-button.outline:hover {
     --color: var(--secondary);
     --background: var(--secondary);
 }
+
+.text-green{
+    color: --var(--secondary)
+}

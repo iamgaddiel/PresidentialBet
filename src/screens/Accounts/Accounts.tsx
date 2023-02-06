@@ -6,6 +6,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import useAuth from "../../hooks/useAuth";
 import useCollection from "../../hooks/useCollection";
 import { ACCOUNTS_COLLECTION } from "../../keys";
+import { UserCollectionType } from "../../@types/user";
 
 
 
@@ -36,75 +37,92 @@ type BankAccountType = {
 
 const Accounts = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<BankAccountInputType>();
-    const [accountVerified, setAccountVerified] = useState(false)
+    const [accountFound, setAccountFound] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [showAlert, setShowAlert] = useState(false)
     const [toastMsg, setToastMsg] = useState("")
+    const [showToast, setShowToast] = useState(false)
     const [account, setAccount] = useState<BankAccountType>()
-    const { verifyBvn, verifyUserAccount, authUser } = useAuth()
+    const { getStoredUser } = useAuth()
     const { getFilteredCollection, addToCollection } = useCollection()
+    const [user, setUser] = useState<UserCollectionType | null>(null)
 
 
-    const removeExcessiveSpaces = (text: string) => text.split(" ").filter(e => e !== "").join(" ").toLowerCase()
 
 
-    const getUserAccount = () => {
-        const _account: any = getFilteredCollection(ACCOUNTS_COLLECTION, authUser?.id!)
+    useEffect(() => {
+        getUser()
+    }, [])
+
+
+
+    async function getUser() {
+        const user: UserCollectionType = await getStoredUser()
+        getUserAccount(user?.id)
+        setUser(user)
+    }
+
+
+    async function getUserAccount(userId: string) {
+        const _account: any = await getFilteredCollection(ACCOUNTS_COLLECTION, userId)
         if (typeof _account !== "undefined" && _account.hasOwnProperty("id")) {
             setAccount(_account)
-            setAccountVerified(true)
-        } else {
-            setAccountVerified(false)
+            setAccountFound(true)
+        } 
+        else {
+            setAccountFound(false)
         }
         setLoading(false)
     }
 
     const handleFormSubmit: SubmitHandler<BankAccountInputType> = async (data) => {
         setLoading(true)
-        const accountDetail = { ...data, user: authUser?.id }
+        const accountDetail = { ...data, user: user?.id }
 
         try {
-
-            // verify bvn
-            // const bvnRes = await verifyBvn(accountDetail)
-            // if (!bvnRes.data.status) {
-            //     setToastMsg(bvnRes.data.message)
-            //     setLoading(false)
-            //     setShowAlert(true)
-            //     return;
-            // }
-
-            // verify account number
-            // const _acc = await verifyUserAccount(data.account_number)
-            // if (!_acc.data.status) {
-            //     setToastMsg('Invalid account number')
-            //     setLoading(false)
-            //     setShowAlert(true)
-            //     return;
-            // }
-
-            // verify account name
-            // if (removeExcessiveSpaces(_acc.data.data.account_name) !== removeExcessiveSpaces(data.account_name)) {
-            //     setToastMsg('Account name and number mismatch')
-            //     setLoading(false)
-            //     setShowAlert(true)
-            //     return;
-            // }
-
             addToCollection(ACCOUNTS_COLLECTION, accountDetail)
-            getUserAccount()
-
+            getUser()
+            getUserAccount(user?.id!)
+            setLoading(false)
         }
         catch (err: any) {
+            if (err.data) {
+                setLoading(false)
+                if (err.data.data.bank) {
+                    let msg = `${"Bank"}: ${err.data.data.bank.message}`
+                    setToastMsg(msg)
+                    setShowToast(true)
+                    return;
+                }
+                if (err.data.data.account_name) {
+                    let msg = `${"Account Name"}: ${err.data.data.account_name.message}`
+                    setToastMsg(msg)
+                    setShowToast(true)
+                    return;
+                }
+                if (err.data.data.account_number) {
+                    let msg = `${"Account Number"}: ${err.data.data.account_number.message}`
+                    setToastMsg(msg)
+                    setShowToast(true)
+                    return;
+                }
+                if (err.data.data.dob) {
+                    let msg = `${"DOB"}: ${err.data.data.dob.message}`
+                    setToastMsg(msg)
+                    setShowToast(true)
+                    return;
+                }
+                if (err.data.data.bvn) {
+                    let msg = `${"Bvn"}: ${err.data.data.bvn.message}`
+                    setToastMsg(msg)
+                    setShowToast(true)
+                    return;
+                }
+            }
             throw new Error(err)
         }
-        setLoading(false)
     }
 
 
-    useEffect(() => {
-        getUserAccount()
-    }, [])
 
     return (
         <IonPage>
@@ -116,19 +134,19 @@ const Accounts = () => {
                     spinner="circular"
                 />
                 <IonToast
-                    isOpen={showAlert}
+                    isOpen={showToast}
                     message={toastMsg}
                     color={"danger"}
-                    onDidDismiss={() => setShowAlert(false)}
+                    onDidDismiss={() => setShowToast(false)}
                     duration={3000}
                     position="top"
                 />
 
 
-                <IonText className="ion-padding">Bank Accounts</IonText>
+                <IonText className="ion-padding">Bank Accounts Details</IonText>
 
                 {
-                    !accountVerified ? (
+                    !accountFound ? (
 
                         <section className="account_details ion-padding">
                             <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -137,7 +155,7 @@ const Accounts = () => {
                                 <div className="input_field">
                                     <div>
                                         <label htmlFor="">
-                                            <small>Bank</small>
+                                            <small className='text-green'>Bank</small>
                                         </label>
                                         <IonInput
                                             type="text"
@@ -156,7 +174,7 @@ const Accounts = () => {
                                 {/* DOB */}
                                 <div className="input_field">
                                     <div>
-                                        <label htmlFor="">
+                                        <label htmlFor="" className='text-green'>
                                             <small>DOB</small>
                                         </label>
                                         <IonInput
