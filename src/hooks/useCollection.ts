@@ -82,7 +82,21 @@ const useCollection = () => {
 
   const unSubscribeFromCollection = (collection: string) =>
     pb.collection(collection).unsubscribe();
-  
+
+
+  const deleteRecord = async (collection: string, recordId: string) => {
+    try{
+      await pb.collection(collection).delete(recordId)
+      return {isDeleted: true}
+    }
+    catch(error){
+      return {
+        error,
+        isDeleted: false
+      }
+    }
+  }
+
   return {
     pb,
     getSingleCollection,
@@ -94,6 +108,7 @@ const useCollection = () => {
     subscribeToCollectionRecord,
     unSubscribeFromCollection,
     filterCollectionByUser,
+    deleteRecord
   };
 };
 

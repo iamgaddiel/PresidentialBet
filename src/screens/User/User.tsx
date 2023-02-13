@@ -1,18 +1,22 @@
-import { IonAvatar, IonBadge, IonContent, IonIcon, IonItem, IonLabel, IonList, IonPage } from '@ionic/react'
-import { cardSharp, logOut, personSharp, walletSharp } from 'ionicons/icons'
+import { IonAlert, IonAvatar, IonBadge, IonContent, IonIcon, IonItem, IonItemDivider, IonLabel, IonList, IonPage } from '@ionic/react'
+import { cardSharp, logOut, personSharp, trash, walletSharp } from 'ionicons/icons'
 import { useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import { UserCollectionType } from '../../@types/user'
 import Header from '../../components/Header'
 import useAuth from '../../hooks/useAuth'
 import { UtilContext, UtilContextValues } from '../../context/utilContext'
+import useCollection from '../../hooks/useCollection'
+import { USERS_COLLECTION } from '../../keys'
 
 
 const User = () => {
     const { logoutUser, getStoredUser, deleteStoredUser } = useAuth()
+    const [isOpen, setIsOpen] = useState(false)
     const [user, setUser] = useState<UserCollectionType>()
     const history = useHistory()
     const { setShowTabs } = useContext(UtilContext) as UtilContextValues
+    const { deleteRecord } = useCollection()
 
     const getUser = async () => {
         setUser(await getStoredUser())
@@ -25,6 +29,11 @@ const User = () => {
         history.push("/login")
     }
 
+    async function deleteUserAccount() {
+        const { isDeleted } = await deleteRecord(USERS_COLLECTION, user?.id!)
+        if (isDeleted) deAuthenticateUser();
+    }
+
     useEffect(() => {
         getUser()
     }, [])
@@ -33,6 +42,27 @@ const User = () => {
         <IonPage>
             <Header title={'User'} />
             <IonContent fullscreen className="ion-padding">
+
+                <IonAlert
+                    isOpen={isOpen}
+                    buttons={
+                        [
+                            {
+                                text: 'Confirm',
+                                handler: () => deleteUserAccount()
+                            },
+                            {
+                                text: 'Ignore',
+                                handler: (param) => setIsOpen(false)
+                            }
+                        ]
+                    }
+                    onDidDismiss={() => setIsOpen(false)}
+                    header={"WARNING  \u26A0\uFE0F"}
+                    // subHeader={"You are about to delete your account!"}
+                    message={"Are you sure you want to delete your account?"}
+                    translucent
+                />
 
                 <section className="profile_banner text-center">
                     <div className=''>
@@ -80,10 +110,17 @@ const User = () => {
                                     <span className="text-light ion-margin-start">Wallet</span>
                                 </IonLabel>
                             </IonItem>
+                            <IonItemDivider />
                             <IonItem onClick={() => deAuthenticateUser()}>
                                 <IonLabel>
                                     <IonIcon color='danger' icon={logOut} slot='start' />
-                                    <span className="text-danger ion-margin-start">logout</span>
+                                    <span className="text-danger ion-margin-start">Logout</span>
+                                </IonLabel>
+                            </IonItem>
+                            <IonItem onClick={() => setIsOpen(true)}>
+                                <IonLabel>
+                                    <IonIcon color='danger' icon={trash} slot='start' />
+                                    <span className="text-danger ion-margin-start">Delete Account</span>
                                 </IonLabel>
                             </IonItem>
                         </IonList>
